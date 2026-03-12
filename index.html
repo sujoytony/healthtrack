@@ -45,7 +45,7 @@
     <div class="energy-row1">
       <div class="e-card">
         <div style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Resting</div>
-        <div class="e-val" style="color:rgba(255,255,255,0.8)">2200</div>
+        <div class="e-val" style="color:rgba(255,255,255,0.8)">2000</div>
         <div class="e-unit">kcal</div>
         <div class="e-lbl" style="color:rgba(255,255,255,0.55)">Fixed BMR</div>
       </div>
@@ -57,7 +57,7 @@
       </div>
       <div class="e-card hi">
         <div style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total Burn</div>
-        <div class="e-val" style="color:#fff" id="statTotal">2200</div>
+        <div class="e-val" style="color:#fff" id="statTotal">2000</div>
         <div class="e-unit">kcal</div>
         <div class="e-lbl" style="color:rgba(255,255,255,0.7)">BMR + Active</div>
       </div>
@@ -76,7 +76,7 @@
         <span style="font-size:22px" id="deficitIcon">✅</span>
         <div>
           <div style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px" id="deficitLbl">Energy Deficit</div>
-          <div style="font-size:20px;font-weight:800;line-height:1" id="deficitVal">2200</div>
+          <div style="font-size:20px;font-weight:800;line-height:1" id="deficitVal">2000</div>
           <div style="font-size:8px;text-transform:uppercase;letter-spacing:.4px" id="deficitSub">kcal · on track</div>
         </div>
       </div>
@@ -139,12 +139,12 @@
       <div style="font-size:13px;font-weight:700;color:#1E3A5F;margin-bottom:10px">🔥 Active Energy Breakdown</div>
       <div id="burnSummaryRows"></div>
       <div style="border-top:1px solid #BFDBFE;margin-top:8px;padding-top:8px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1E3A5F"><span>Resting (BMR)</span><span style="font-weight:700;color:#64748B">2,200 kcal</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1E3A5F"><span>Resting (BMR)</span><span style="font-weight:700;color:#64748B">2,000 kcal</span></div>
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1E3A5F"><span>Active Energy</span><span style="font-weight:700;color:#0891B2" id="totalActiveBurn">0 kcal</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;color:#1E3A5F;border-top:1px solid #BFDBFE;padding-top:8px;margin-top:4px"><span>Total Energy Utilisation</span><span style="color:#2563EB" id="totalBurnLabel">2,200 kcal</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;color:#1E3A5F;border-top:1px solid #BFDBFE;padding-top:8px;margin-top:4px"><span>Total Energy Utilisation</span><span style="color:#2563EB" id="totalBurnLabel">2,000 kcal</span></div>
       </div>
     </div>
-    <div class="info-box"><strong>Active energy rates:</strong><br/>🚶 Walking ~55 kcal/km &nbsp;·&nbsp; 🏃 Running ~70 kcal/km<br/>Resting energy (BMR) is fixed at <strong>2,200 kcal/day</strong>.</div>
+    <div class="info-box"><strong>Active energy rates:</strong><br/>🚶 Walking ~55 kcal/km &nbsp;·&nbsp; 🏃 Running ~70 kcal/km<br/>Resting energy (BMR) is fixed at <strong>2,000 kcal/day</strong>.</div>
   </div>
   <!-- ─── PLAN TAB ─── -->
   <div class="tab fade" id="tab-plan">
@@ -263,7 +263,7 @@
 </div>
 <!-- ═══════════ SCRIPT ═══════════ -->
 <script>/* ── Constants ── */
-const RESTING_ENERGY = 2200;
+const RESTING_ENERGY = 2000;
 const INTAKE_TARGET  = 1600;
 const STORAGE_KEY    = "vitallog_v7";
 const FOODS = [
