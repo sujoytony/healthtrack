@@ -1,0 +1,19 @@
+{
+  "name": "Tony's Healthtrack",
+  "short_name": "Healthtrack",
+  "description": "Personal daily health, food & activity tracker",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF4FB",
+  "theme_color": "#1E3A5F",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231E3A5F'/><text y='.9em' font-size='75' x='12'>💪</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"]
+}

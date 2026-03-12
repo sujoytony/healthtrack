@@ -2,630 +2,662 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>VitalLog – Health Tracker</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Tony's Healthtrack</title>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="VitalLog"/>
-<meta name="theme-color" content="#0D1B2A"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;overscroll-behavior:none;}
-  body{background:#0D1B2A;font-family:'DM Sans',sans-serif;color:#E8F0F7;overflow-x:hidden;}
-  input[type=number]::-webkit-inner-spin-button,
-  input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-  input[type=number]{-moz-appearance:textfield;}
-  input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5) sepia(1) saturate(3) hue-rotate(175deg);cursor:pointer;}
-  ::-webkit-scrollbar{width:3px;}
-  ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:#1E3A5F;border-radius:99px;}
-  .fade{animation:fadeUp 0.22s ease both;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-</style>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Tony's Healthtrack"/>
+<meta name="theme-color" content="#1E3A5F"/>
+<link rel="manifest" href="manifest.json"/>
+<style>*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}html,body{height:100%;overscroll-behavior:none;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;background:#EEF4FB;color:#1E3A5F;min-height:100vh;font-size:14px;}input{font-family:inherit;}input:focus{outline:none;}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}input[type=number]{-moz-appearance:textfield;}input[type=date]::-webkit-calendar-picker-indicator{cursor:pointer;filter:invert(0.3) sepia(1) saturate(2) hue-rotate(180deg);}input[type=checkbox]{width:20px;height:20px;cursor:pointer;flex-shrink:0;accent-color:#2563EB;}button{cursor:pointer;}.sticky-header{background:linear-gradient(135deg,#1E3A5F 0%,#2563EB 100%);padding:14px 16px 12px;box-shadow:0 4px 20px rgba(30,58,95,0.25);position:sticky;top:0;z-index:100;}.page-body{max-width:500px;margin:0 auto;padding:14px 14px 90px;}.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(30,58,95,0.08);margin-bottom:12px;}.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #DBEAFE;padding:8px 0 max(8px,env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(30,58,95,0.08);z-index:200;}.bnav-inner{max-width:500px;margin:0 auto;display:flex;}.bnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;background:none;border:none;font-family:inherit;}.bnav-lbl{font-size:10px;font-weight:700;color:#94A3B8;}.bnav-btn.active .bnav-lbl{color:#2563EB;}.bnav-dot{width:20px;height:2px;background:#2563EB;border-radius:99px;display:none;}.bnav-btn.active .bnav-dot{display:block;}.tab{display:none;}.tab.active{display:block;}.nav-strip{display:flex;gap:4px;background:rgba(255,255,255,0.12);border-radius:13px;padding:4px;}.nav-btn{flex:1;padding:9px 0;border:none;font-family:inherit;font-size:11px;font-weight:700;border-radius:10px;background:transparent;color:rgba(255,255,255,0.55);transition:background 0.2s,color 0.2s,box-shadow 0.2s;}.nav-btn.active{background:#fff;color:#1E3A5F;box-shadow:0 2px 8px rgba(0,0,0,0.15);}.energy-row1{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}.energy-row2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}.e-card{background:rgba(255,255,255,0.12);border-radius:12px;padding:9px 8px;text-align:center;}.e-card.hi{background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.3);}.e-val{font-size:18px;font-weight:800;line-height:1;}.e-unit{font-size:8px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}.e-lbl{font-size:9px;font-weight:600;margin-top:3px;line-height:1.3;}.e-wide{background:rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;}.e-wide.hi{background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.3);}.progress-wrap{height:6px;background:rgba(255,255,255,0.15);border-radius:99px;overflow:hidden;}.progress-bar{height:100%;border-radius:99px;transition:width .5s ease;will-change:width;}.meal-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(30,58,95,0.08);}.logged-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F0F7FF;}.remove-btn{background:none;border:none;color:#EF4444;font-size:18px;padding:0;line-height:1;}.add-toggle{width:30px;height:30px;border:none;border-radius:8px;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:background .2s;}.picker-wrap{background:#F8FBFF;border-radius:14px;padding:14px 12px;margin-top:12px;}.food-row{display:flex;align-items:center;gap:10px;padding:11px 10px;border-radius:11px;margin-bottom:6px;cursor:pointer;transition:background .15s,border-color .15s;}.qty-input{width:54px;height:34px;border-radius:8px;font-size:14px;font-weight:700;text-align:center;font-family:inherit;padding:0 4px;transition:background .15s,border-color .15s;}.picker-summary{margin-top:12px;padding:12px 14px;background:#fff;border-radius:11px;}.cancel-btn{flex:1;padding:10px;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:10px;color:#64748B;font-size:13px;font-family:inherit;font-weight:600;margin-right:8px;}.add-all-btn{flex:2;padding:10px;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;transition:background .2s,color .2s;}.day-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;touch-action:pan-x;-webkit-overflow-scrolling:touch;}.day-strip::-webkit-scrollbar{display:none;}.day-pill{flex-shrink:0;min-width:44px;padding:8px 4px;border-radius:22px;border:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;transition:background .18s,box-shadow .18s;background:#F0F4F8;}.day-pill.active{background:linear-gradient(135deg,#1E3A5F,#2563EB);box-shadow:0 4px 12px rgba(37,99,235,0.35);}.day-pill-lbl{font-size:11px;font-weight:700;color:#94A3B8;}.day-pill.active .day-pill-lbl{color:#fff;}.day-pill.today-pill .day-pill-lbl{color:#2563EB;}.today-dot{width:5px;height:5px;border-radius:50%;background:#2563EB;}.day-pill.active .today-dot{background:#86EFAC;}.accordion{background:#fff;border-radius:16px;margin-bottom:10px;box-shadow:0 2px 12px rgba(30,58,95,0.08);overflow:hidden;}.accordion-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;user-select:none;}.accordion-hdr:active{background:#FAFBFF;}.accordion-body{border-top:1px solid #F0F7FF;padding:12px 16px 14px;}.accordion-body.closed{display:none;}.plan-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F4F8FF;}.plan-row:last-of-type{border-bottom:none;}.chevron{font-size:18px;color:#94A3B8;transition:transform .2s;line-height:1;}.chevron.open{transform:rotate(180deg);}.cal-pill{font-size:12px;font-weight:800;padding:4px 10px;border-radius:99px;}.tip-box{margin-top:10px;font-size:11px;border-radius:10px;padding:9px 12px;line-height:1.7;}.meal-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid #F0F7FF;}.craving-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}.craving-card{background:#F0FDF4;border:1px solid #6EE7B7;border-radius:12px;padding:12px;text-align:center;}.week-table{width:100%;border-collapse:separate;border-spacing:0;}.week-table tr{cursor:pointer;}.week-table td{padding:9px 8px;font-size:12px;vertical-align:middle;border-bottom:1px solid #F0F7FF;}.week-table tr:last-child td{border-bottom:none;}.week-table tr.selected-row td{background:#EFF6FF;}.week-table tr.today-row td:first-child{color:#2563EB;font-weight:700;}.act-row{display:flex;align-items:center;gap:12px;}.act-input{width:72px;border-radius:10px;padding:9px 8px;font-size:16px;text-align:center;font-family:inherit;font-weight:700;}.burn-badge{border-radius:10px;padding:6px 10px;text-align:center;min-width:65px;}.divider{height:1px;background:#EEF4FB;margin:14px 0;}.hist-card{border-radius:16px;background:#fff;padding:14px;margin-bottom:10px;box-shadow:0 2px 12px rgba(30,58,95,0.08);}.hist-bar-bg{height:4px;background:#EEF4FB;border-radius:99px;overflow:hidden;margin:8px 0 6px;}.hist-bar{height:100%;border-radius:99px;}.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);color:#fff;padding:10px 22px;border-radius:99px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 6px 20px rgba(30,58,95,0.25);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s;}.toast.show{opacity:1;}.modal-bg{position:fixed;inset:0;background:rgba(30,58,95,0.5);z-index:500;display:none;align-items:center;justify-content:center;padding:24px;}.modal-bg.show{display:flex;}.modal{background:#fff;border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(30,58,95,0.2);}.info-box{background:#DBEAFE;border-radius:12px;padding:11px 14px;font-size:12px;color:#1E3A5F;line-height:1.7;margin-bottom:12px;}@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}.fade{animation:fadeUp .2s ease both;}</style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useCallback } = React;
-
-const DAILY_GOAL = 2000;
-const STORAGE_KEY = "vitallog_v2";
-
-const FOOD_OPTIONS = {
-  "Proteins": [
-    {id:"full_egg",   name:"Full Egg",      emoji:"🥚", cal:70,  unit:"pc"},
-    {id:"egg_white",  name:"Egg White",     emoji:"🍳", cal:17,  unit:"pc"},
-    {id:"chicken",    name:"Chicken",       emoji:"🍗", cal:165, unit:"100g"},
-    {id:"fish",       name:"Fish",          emoji:"🐟", cal:120, unit:"100g"},
-    {id:"tuna",       name:"Tuna",          emoji:"🐡", cal:100, unit:"100g"},
-    {id:"tofu",       name:"Tofu",          emoji:"🫘", cal:76,  unit:"100g"},
-    {id:"prawns",     name:"Prawns",        emoji:"🦐", cal:85,  unit:"100g"},
-  ],
-  "Carbs": [
-    {id:"rice",       name:"Rice",          emoji:"🍚", cal:45,  unit:"spoon"},
-    {id:"bread",      name:"Bread",         emoji:"🍞", cal:80,  unit:"slice"},
-    {id:"oats",       name:"Oats",          emoji:"🌾", cal:150, unit:"bowl"},
-    {id:"noodles",    name:"Noodles",       emoji:"🍜", cal:220, unit:"bowl"},
-    {id:"potato",     name:"Potato",        emoji:"🥔", cal:130, unit:"pc"},
-    {id:"chapati",    name:"Chapati/Roti",  emoji:"🫓", cal:100, unit:"pc"},
-  ],
-  "Healthy": [
-    {id:"nuts",       name:"Nuts",          emoji:"🥜", cal:170, unit:"handful"},
-    {id:"vegetables", name:"Vegetables",    emoji:"🥦", cal:50,  unit:"cup"},
-    {id:"fruits",     name:"Fruits",        emoji:"🍎", cal:80,  unit:"pc"},
-    {id:"salad",      name:"Salad",         emoji:"🥗", cal:40,  unit:"bowl"},
-    {id:"avocado",    name:"Avocado",       emoji:"🥑", cal:160, unit:"half"},
-    {id:"banana",     name:"Banana",        emoji:"🍌", cal:90,  unit:"pc"},
-  ],
-  "Dairy": [
-    {id:"milk",       name:"Milk",          emoji:"🥛", cal:120, unit:"glass"},
-    {id:"yogurt",     name:"Yogurt",        emoji:"🫙", cal:100, unit:"cup"},
-    {id:"cheese",     name:"Cheese",        emoji:"🧀", cal:110, unit:"slice"},
-    {id:"butter",     name:"Butter",        emoji:"🧈", cal:100, unit:"tsp"},
-  ],
-  "Drinks": [
-    {id:"water",      name:"Water",         emoji:"💧", cal:0,   unit:"glass"},
-    {id:"coffee",     name:"Coffee",        emoji:"☕", cal:5,   unit:"cup"},
-    {id:"juice",      name:"Juice",         emoji:"🍊", cal:110, unit:"glass"},
-    {id:"pro_shake",  name:"Protein Shake", emoji:"🥤", cal:150, unit:"scoop"},
-    {id:"green_tea",  name:"Green Tea",     emoji:"🍵", cal:2,   unit:"cup"},
-  ],
-  "Snacks": [
-    {id:"biscuits",   name:"Biscuits",      emoji:"🍪", cal:50,  unit:"pc"},
-    {id:"chips",      name:"Chips",         emoji:"🥨", cal:140, unit:"pack"},
-    {id:"dark_choc",  name:"Dark Choc",     emoji:"🍫", cal:55,  unit:"square"},
-    {id:"granola",    name:"Granola Bar",   emoji:"🍫", cal:190, unit:"bar"},
-  ],
-};
-
-const MEALS = [
-  {id:"breakfast",label:"Breakfast",emoji:"🌅",time:"7–9 AM",  color:"#F59E0B"},
-  {id:"lunch",    label:"Lunch",    emoji:"☀️",time:"12–2 PM", color:"#10B981"},
-  {id:"snacks",   label:"Snacks",   emoji:"🍃",time:"3–5 PM",  color:"#8B5CF6"},
-  {id:"dinner",   label:"Dinner",   emoji:"🌙",time:"7–9 PM",  color:"#3B82F6"},
-];
-
-const ACTIVITIES = [
-  {id:"run",     label:"Run",           emoji:"🏃",unit:"km",  calPerUnit:60,  color:"#EF4444"},
-  {id:"walk",    label:"Walk",          emoji:"🚶",unit:"km",  calPerUnit:40,  color:"#F59E0B"},
-  {id:"stairs",  label:"Stair Stepping",emoji:"🪜",unit:"min", calPerUnit:8,   color:"#8B5CF6"},
-  {id:"plank",   label:"Plank",         emoji:"🧘",unit:"min", calPerUnit:4,   color:"#10B981"},
-  {id:"pushups", label:"Push Ups",      emoji:"💪",unit:"reps",calPerUnit:0.5, color:"#3B82F6"},
-  {id:"cycling", label:"Cycling",       emoji:"🚴",unit:"km",  calPerUnit:30,  color:"#EC4899"},
-  {id:"swimming",label:"Swimming",      emoji:"🏊",unit:"min", calPerUnit:10,  color:"#06B6D4"},
-  {id:"yoga",    label:"Yoga",          emoji:"🧘",unit:"min", calPerUnit:3,   color:"#A78BFA"},
-  {id:"hiit",    label:"HIIT",          emoji:"🔥",unit:"min", calPerUnit:12,  color:"#FB923C"},
-];
-
-const emptyDay = () => ({meals:{breakfast:[],lunch:[],snacks:[],dinner:[]},activities:[],water:0});
-
-const loadAll  = () => { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } };
-const saveAll  = (d) => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {} };
-
-function App() {
-  const today = new Date().toISOString().split("T")[0];
-  const [allData,  setAllData]  = useState(loadAll);
-  const [date,     setDate]     = useState(today);
-  const [tab,      setTab]      = useState("food");
-  const [mealTab,  setMealTab]  = useState("breakfast");
-  const [addingTo, setAddingTo] = useState(null);
-  const [actInput, setActInput] = useState({});
-  const [foodQty,  setFoodQty]  = useState({});
-  const [search,   setSearch]   = useState("");
-  const [openCat,  setOpenCat]  = useState(null);
-  const [toast,    setToast]    = useState(null);
-  const [clearDlg, setClearDlg] = useState(false);
-
-  useEffect(() => { saveAll(allData); }, [allData]);
-
-  const day    = allData[date] || emptyDay();
-  const setDay = useCallback((fn) => {
-    setAllData(p => ({ ...p, [date]: fn(p[date] || emptyDay()) }));
-  }, [date]);
-
-  const totalFood   = Object.values(day.meals).flat().reduce((s,i) => s+i.totalCal, 0);
-  const totalBurned = day.activities.reduce((s,a) => s+a.burned, 0);
-  const net         = totalFood - totalBurned;
-  const pct         = Math.min((totalFood/DAILY_GOAL)*100, 100);
-  const mealCals    = (id) => day.meals[id].reduce((s,i) => s+i.totalCal, 0);
-
-  const toast$ = (msg, c="#10B981") => { setToast({msg,c}); setTimeout(()=>setToast(null),2200); };
-
-  const addFood = (mealId, food) => {
-    const qty = parseFloat(foodQty[food.id]||1);
-    if (!qty||qty<=0) { toast$("Enter a valid quantity","#EF4444"); return; }
-    const entry = {...food, qty, totalCal:Math.round(food.cal*qty), uid:`${food.id}-${Date.now()}`};
-    setDay(d => ({...d, meals:{...d.meals,[mealId]:[...d.meals[mealId],entry]}}));
-    toast$(`${food.emoji} ${food.name} added!`);
-    setFoodQty(p => ({...p,[food.id]:""}));
-  };
-
-  const removeFood = (mealId, uid) =>
-    setDay(d => ({...d, meals:{...d.meals,[mealId]:d.meals[mealId].filter(i=>i.uid!==uid)}}));
-
-  const addAct = (act) => {
-    const val = parseFloat(actInput[act.id]||0);
-    if (!val||val<=0) { toast$("Enter a valid amount","#EF4444"); return; }
-    const burned = Math.round(act.calPerUnit*val);
-    setDay(d => ({...d, activities:[...d.activities,{...act,value:val,burned,logId:Date.now()}]}));
-    toast$(`${act.emoji} ${act.label} logged! −${burned} kcal`);
-    setActInput(p => ({...p,[act.id]:""}));
-  };
-
-  const removeAct = (logId) =>
-    setDay(d => ({...d, activities:d.activities.filter(a=>a.logId!==logId)}));
-
-  const setWater = (n) => setDay(d => ({...d, water:Math.max(0,n)}));
-
-  const clearDay = () => { setDay(()=>emptyDay()); setClearDlg(false); toast$("Day cleared","#64B5F6"); };
-
-  const allFoods = Object.values(FOOD_OPTIONS).flat();
-  const filtered = search.trim() ? allFoods.filter(f=>f.name.toLowerCase().includes(search.toLowerCase())) : null;
-  const histDates = Object.keys(allData).filter(d=>d!==date).sort().reverse().slice(0,14);
-
-  const S = (ch) => <div style={{fontSize:10,color:"#334155",textTransform:"uppercase",letterSpacing:1,marginBottom:9,marginTop:4}}>{ch}</div>;
-
-  return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(160deg,#0D1B2A 0%,#172539 60%,#0D1B2A 100%)"}}>
-
-      {/* Toast */}
-      {toast && <div style={{position:"fixed",top:14,left:"50%",transform:"translateX(-50%)",
-        background:toast.c,color:"#fff",padding:"10px 22px",borderRadius:99,fontSize:13,
-        fontWeight:700,zIndex:9999,boxShadow:"0 6px 24px rgba(0,0,0,0.45)",
-        whiteSpace:"nowrap",pointerEvents:"none",animation:"fadeUp 0.2s ease"}}>{toast.msg}</div>}
-
-      {/* HEADER */}
-      <div style={{background:"rgba(13,27,42,0.96)",backdropFilter:"blur(24px)",
-        borderBottom:"1px solid rgba(255,255,255,0.07)",padding:"14px 16px 13px",
-        position:"sticky",top:0,zIndex:100}}>
-        <div style={{maxWidth:520,margin:"0 auto"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-            <div>
-              <div style={{fontSize:20,fontWeight:800,letterSpacing:"-0.5px",color:"#fff",lineHeight:1}}>🌿 VitalLog</div>
-              <div style={{fontSize:11,color:"#64B5F6",marginTop:3}}>
-                {new Date(date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})}
-                {date===today && <span style={{marginLeft:6,background:"#1E3A5F",color:"#64B5F6",fontSize:9,padding:"1px 7px",borderRadius:99,fontWeight:700}}>TODAY</span>}
-              </div>
-            </div>
-            <div style={{display:"flex",gap:7,alignItems:"center"}}>
-              <input type="date" value={date} onChange={e=>{setDate(e.target.value);setAddingTo(null);}}
-                style={{background:"rgba(100,181,246,0.1)",border:"1px solid rgba(100,181,246,0.25)",
-                  borderRadius:10,color:"#64B5F6",padding:"6px 10px",fontSize:12,cursor:"pointer",fontFamily:"inherit"}}/>
-              <button onClick={()=>setClearDlg(true)} title="Clear day"
-                style={{background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.2)",
-                  borderRadius:9,color:"#EF4444",padding:"6px 10px",fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>🗑</button>
-            </div>
-          </div>
-
-          {/* Stats row */}
-          <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,marginBottom:11}}>
-            {[
-              {l:"Eaten",  v:totalFood,   s:"kcal",    c:"#F59E0B"},
-              {l:"Burned", v:totalBurned, s:"kcal",    c:"#10B981"},
-              {l:"Net",    v:net,         s:"kcal",    c:net>DAILY_GOAL?"#EF4444":"#60A5FA"},
-              {l:"Water",  v:day.water,   s:"glasses", c:"#06B6D4"},
-            ].map(s=>(
-              <div key={s.l} style={{background:"rgba(255,255,255,0.05)",borderRadius:10,
-                padding:"8px 5px",textAlign:"center",border:`1px solid ${s.c}1A`}}>
-                <div style={{fontSize:17,fontWeight:800,color:s.c,lineHeight:1}}>{s.v}</div>
-                <div style={{fontSize:9,color:"#475569",marginTop:2,textTransform:"uppercase",letterSpacing:0.4}}>{s.s}</div>
-                <div style={{fontSize:9,color:"#334155",marginTop:1}}>{s.l}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Progress bar */}
+<div class="toast" id="toast"></div>
+<!-- Clear modal -->
+<div class="modal-bg" id="clearModal">
+  <div class="modal">
+    <div style="font-size:36px;margin-bottom:10px">🗑️</div>
+    <div style="font-size:15px;font-weight:700;color:#1E3A5F;margin-bottom:6px">Clear this day?</div>
+    <div style="font-size:12px;color:#94A3B8;margin-bottom:20px;line-height:1.6" id="clearModalText"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="hideClearModal()" style="flex:1;padding:11px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;color:#64748B;font-size:13px;font-family:inherit;font-weight:600">Cancel</button>
+      <button onclick="confirmClear()" style="flex:1;padding:11px;background:#FEF2F2;border:1px solid #FECACA;border-radius:11px;color:#DC2626;font-size:13px;font-family:inherit;font-weight:700">Clear</button>
+    </div>
+  </div>
+</div>
+<!-- ═══════════ STICKY HEADER ═══════════ -->
+<div class="sticky-header">
+  <div style="max-width:500px;margin:0 auto">
+    <!-- Title row -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div>
+        <div style="font-size:21px;font-weight:800;color:#fff;letter-spacing:-.5px">💪 Tony's Healthtrack</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px" id="headerDate"></div>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <input type="date" id="datePicker" onchange="onDateChange(this.value)"
+          style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;padding:6px 10px;font-size:12px;font-family:inherit"/>
+        <button onclick="showClearModal()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:9px;color:#fff;padding:7px 10px;font-size:14px">🗑</button>
+      </div>
+    </div>
+    <!-- Energy stats row 1 -->
+    <div class="energy-row1">
+      <div class="e-card">
+        <div style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Resting</div>
+        <div class="e-val" style="color:rgba(255,255,255,0.8)">2200</div>
+        <div class="e-unit">kcal</div>
+        <div class="e-lbl" style="color:rgba(255,255,255,0.55)">Fixed BMR</div>
+      </div>
+      <div class="e-card">
+        <div style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Active</div>
+        <div class="e-val" style="color:#67E8F9" id="statActive">0</div>
+        <div class="e-unit">kcal</div>
+        <div class="e-lbl" style="color:rgba(255,255,255,0.55)" id="statActiveSub">No activity</div>
+      </div>
+      <div class="e-card hi">
+        <div style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Total Burn</div>
+        <div class="e-val" style="color:#fff" id="statTotal">2200</div>
+        <div class="e-unit">kcal</div>
+        <div class="e-lbl" style="color:rgba(255,255,255,0.7)">BMR + Active</div>
+      </div>
+    </div>
+    <!-- Energy stats row 2 -->
+    <div class="energy-row2">
+      <div class="e-wide">
+        <span style="font-size:22px">🍽️</span>
+        <div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Calorie Intake</div>
+          <div style="font-size:20px;font-weight:800;color:rgba(255,255,255,0.95)" id="statIntake">0</div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:.4px">kcal consumed</div>
+        </div>
+      </div>
+      <div class="e-wide hi" id="deficitCard">
+        <span style="font-size:22px" id="deficitIcon">✅</span>
+        <div>
+          <div style="font-size:8px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px" id="deficitLbl">Energy Deficit</div>
+          <div style="font-size:20px;font-weight:800;line-height:1" id="deficitVal">2200</div>
+          <div style="font-size:8px;text-transform:uppercase;letter-spacing:.4px" id="deficitSub">kcal · on track</div>
+        </div>
+      </div>
+    </div>
+    <!-- Intake progress -->
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:10px;color:rgba(255,255,255,0.45)">Intake target: 1600 kcal</span>
+        <span style="font-size:10px;font-weight:700" id="progressLbl">0 / 1600</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+    <!-- Tab nav -->
+    <div class="nav-strip">
+      <button class="nav-btn active" onclick="switchTab('log',this)">📋 Log</button>
+      <button class="nav-btn" onclick="switchTab('activity',this)">🏃 Activity</button>
+      <button class="nav-btn" onclick="switchTab('plan',this)">🥗 Plan</button>
+      <button class="nav-btn" onclick="switchTab('history',this)">📅 History</button>
+    </div>
+  </div>
+</div>
+<!-- ═══════════ PAGE BODY ═══════════ -->
+<div class="page-body">
+  <!-- ─── LOG TAB ─── -->
+  <div class="tab active fade" id="tab-log">
+    <div id="mealCards"></div>
+    <div class="info-box" id="logInfoBox"></div>
+  </div>
+  <!-- ─── ACTIVITY TAB ─── -->
+  <div class="tab fade" id="tab-activity">
+    <div class="card">
+      <div style="font-size:15px;font-weight:700;color:#1E3A5F;margin-bottom:16px">🏃 Today's Activity</div>
+      <div class="act-row">
+        <span style="font-size:28px">🚶</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#1E3A5F">Walking</div><div style="font-size:11px;color:#94A3B8">~55 kcal/km</div></div>
+        <input type="number" class="act-input" id="walkInput" min="0" step="0.5" placeholder="0"
+          oninput="onActivityChange()" style="background:#ECFEFF;border:1.5px solid #0891B255;color:#1E3A5F"/>
+        <span style="font-size:12px;color:#94A3B8;min-width:18px">km</span>
+        <div class="burn-badge" style="background:#0891B215;border:1px solid #0891B233" id="walkBadge">
+          <div style="font-size:14px;font-weight:800;color:#0891B2" id="walkBurnVal">0</div>
+          <div style="font-size:9px;color:#94A3B8">kcal</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="act-row">
+        <span style="font-size:28px">🏃</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#1E3A5F">Running</div><div style="font-size:11px;color:#94A3B8">~70 kcal/km</div></div>
+        <input type="number" class="act-input" id="runInput" min="0" step="0.5" placeholder="0"
+          oninput="onActivityChange()" style="background:#EFF6FF;border:1.5px solid #2563EB55;color:#1E3A5F"/>
+        <span style="font-size:12px;color:#94A3B8;min-width:18px">km</span>
+        <div class="burn-badge" style="background:#2563EB15;border:1px solid #2563EB33" id="runBadge">
+          <div style="font-size:14px;font-weight:800;color:#2563EB" id="runBurnVal">0</div>
+          <div style="font-size:9px;color:#94A3B8">kcal</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="burnSummaryCard" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);display:none">
+      <div style="font-size:13px;font-weight:700;color:#1E3A5F;margin-bottom:10px">🔥 Active Energy Breakdown</div>
+      <div id="burnSummaryRows"></div>
+      <div style="border-top:1px solid #BFDBFE;margin-top:8px;padding-top:8px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1E3A5F"><span>Resting (BMR)</span><span style="font-weight:700;color:#64748B">2,200 kcal</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;color:#1E3A5F"><span>Active Energy</span><span style="font-weight:700;color:#0891B2" id="totalActiveBurn">0 kcal</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;color:#1E3A5F;border-top:1px solid #BFDBFE;padding-top:8px;margin-top:4px"><span>Total Energy Utilisation</span><span style="color:#2563EB" id="totalBurnLabel">2,200 kcal</span></div>
+      </div>
+    </div>
+    <div class="info-box"><strong>Active energy rates:</strong><br/>🚶 Walking ~55 kcal/km &nbsp;·&nbsp; 🏃 Running ~70 kcal/km<br/>Resting energy (BMR) is fixed at <strong>2,200 kcal/day</strong>.</div>
+  </div>
+  <!-- ─── PLAN TAB ─── -->
+  <div class="tab fade" id="tab-plan">
+    <!-- Day selector -->
+    <div style="background:#fff;border-radius:16px;padding:12px 14px 10px;margin-bottom:12px;box-shadow:0 2px 12px rgba(30,58,95,0.08)">
+      <div style="font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Select Day</div>
+      <div class="day-strip" id="dayStrip"></div>
+      <div style="font-size:10px;color:#94A3B8;margin-top:8px;text-align:center" id="dayStripNote"></div>
+    </div>
+    <!-- Accordion: Breakfast -->
+    <div class="accordion" id="acc-breakfast">
+      <div class="accordion-hdr" onclick="toggleAccordion('breakfast')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">🌅</span>
           <div>
-            <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-              <span style={{fontSize:10,color:"#334155"}}>Goal: {DAILY_GOAL} kcal</span>
-              <span style={{fontSize:10,color:pct>=100?"#EF4444":pct>=80?"#F59E0B":"#475569"}}>{Math.round(pct)}%</span>
-            </div>
-            <div style={{height:5,background:"rgba(255,255,255,0.06)",borderRadius:99,overflow:"hidden"}}>
-              <div style={{height:"100%",width:`${pct}%`,borderRadius:99,transition:"width 0.6s ease",
-                background:pct>=100?"linear-gradient(90deg,#F59E0B,#EF4444)":
-                           pct>=80 ?"linear-gradient(90deg,#F59E0B,#10B981)":
-                                    "linear-gradient(90deg,#10B981,#3B82F6)"}}/>
-            </div>
+            <div style="font-size:14px;font-weight:800;color:#1E3A5F">Breakfast</div>
+            <div style="font-size:11px;color:#94A3B8" id="acc-breakfast-sub">Fixed daily · 104 kcal</div>
           </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cal-pill" style="color:#2563EB;background:#EFF6FF" id="acc-breakfast-cal">104 kcal</span>
+          <span class="chevron open" id="chev-breakfast">▾</span>
         </div>
       </div>
-
-      {/* BODY */}
-      <div style={{maxWidth:520,margin:"0 auto",padding:"0 14px",paddingBottom:88}}>
-
-        {/* Tab bar */}
-        <div style={{display:"flex",gap:5,marginTop:15,marginBottom:16,
-          background:"rgba(255,255,255,0.04)",borderRadius:14,padding:4}}>
-          {[{id:"food",ico:"🍽",l:"Food"},{id:"activity",ico:"🏋️",l:"Activity"},
-            {id:"summary",ico:"📊",l:"Summary"},{id:"history",ico:"📅",l:"History"}].map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)}
-              style={{flex:1,padding:"9px 0",borderRadius:11,border:"none",cursor:"pointer",
-                fontSize:11,fontWeight:700,transition:"all 0.2s",fontFamily:"inherit",
-                background:tab===t.id?"linear-gradient(135deg,#1E3A5F,#2563EB)":"transparent",
-                color:tab===t.id?"#fff":"#475569",
-                boxShadow:tab===t.id?"0 4px 14px rgba(37,99,235,0.3)":"none"}}>
-              {t.ico} {t.l}
-            </button>
-          ))}
-        </div>
-
-        {/* ══ FOOD TAB ══ */}
-        {tab==="food" && <div className="fade">
-          {/* Water */}
-          <div style={{background:"rgba(6,182,212,0.07)",border:"1px solid rgba(6,182,212,0.18)",
-            borderRadius:16,padding:"12px 14px",marginBottom:13,
-            display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div>
-              <div style={{fontSize:13,fontWeight:700,color:"#06B6D4"}}>💧 Water</div>
-              <div style={{display:"flex",gap:3,marginTop:5,flexWrap:"wrap"}}>
-                {[...Array(8)].map((_,i)=>(
-                  <div key={i} onClick={()=>setWater(i<day.water?i:i+1)}
-                    style={{width:14,height:14,borderRadius:3,cursor:"pointer",
-                      background:i<day.water?"#06B6D4":"rgba(6,182,212,0.12)",
-                      transition:"background 0.2s",border:"1px solid rgba(6,182,212,0.2)"}}/>
-                ))}
-              </div>
-              <div style={{fontSize:10,color:"#334155",marginTop:4}}>{day.water}/8 glasses</div>
-            </div>
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <button onClick={()=>setWater(day.water-1)} style={circBtn("#06B6D4")}>−</button>
-              <span style={{fontSize:26,fontWeight:800,color:"#06B6D4",minWidth:28,textAlign:"center"}}>{day.water}</span>
-              <button onClick={()=>setWater(day.water+1)} style={circBtn("#06B6D4")}>+</button>
-            </div>
-          </div>
-
-          {/* Meal selector */}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:13}}>
-            {MEALS.map(m=>(
-              <button key={m.id} onClick={()=>{setMealTab(m.id);setAddingTo(null);setSearch("");}}
-                style={{padding:"11px 12px",borderRadius:14,cursor:"pointer",textAlign:"left",
-                  fontFamily:"inherit",transition:"all 0.2s",
-                  border:`1px solid ${mealTab===m.id?m.color+"55":"rgba(255,255,255,0.06)"}`,
-                  background:mealTab===m.id?`${m.color}12`:"rgba(255,255,255,0.03)"}}>
-                <div style={{fontSize:20,marginBottom:2}}>{m.emoji}</div>
-                <div style={{fontSize:13,fontWeight:700,color:mealTab===m.id?m.color:"#CBD5E1"}}>{m.label}</div>
-                <div style={{fontSize:10,color:"#475569"}}>{m.time} · <span style={{color:mealTab===m.id?m.color:"#64748B",fontWeight:600}}>{mealCals(m.id)} kcal</span></div>
-              </button>
-            ))}
-          </div>
-
-          {/* Active meal panel */}
-          {MEALS.filter(m=>m.id===mealTab).map(meal=>(
-            <div key={meal.id} style={{background:"rgba(255,255,255,0.025)",
-              border:`1px solid ${meal.color}2A`,borderRadius:20,padding:15}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-                <span style={{fontSize:15,fontWeight:800,color:meal.color}}>{meal.emoji} {meal.label}</span>
-                <span style={{fontSize:11,background:`${meal.color}16`,color:meal.color,
-                  padding:"3px 10px",borderRadius:99,fontWeight:700}}>{mealCals(meal.id)} kcal</span>
-              </div>
-
-              {/* Logged items */}
-              {day.meals[meal.id].length===0
-                ? <div style={{textAlign:"center",padding:"14px 0",color:"#2D4059",fontSize:13}}>Nothing logged yet</div>
-                : <div style={{marginBottom:12}}>
-                    {day.meals[meal.id].map(item=>(
-                      <div key={item.uid} style={{display:"flex",justifyContent:"space-between",
-                        alignItems:"center",padding:"8px 10px",
-                        background:"rgba(255,255,255,0.04)",borderRadius:10,marginBottom:5}}>
-                        <span style={{fontSize:13}}>{item.emoji} {item.name}</span>
-                        <div style={{display:"flex",alignItems:"center",gap:8}}>
-                          <span style={{fontSize:11,color:"#475569"}}>×{item.qty} {item.unit}</span>
-                          <span style={{fontSize:12,fontWeight:700,color:meal.color}}>{item.totalCal}</span>
-                          <button onClick={()=>removeFood(meal.id,item.uid)}
-                            style={{background:"none",border:"none",cursor:"pointer",color:"#EF4444",fontSize:17,padding:0,lineHeight:1,fontFamily:"inherit"}}>×</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-              }
-
-              {/* Food picker */}
-              {addingTo===meal.id ? (
-                <div>
-                  <input placeholder="🔍 Search food…" value={search} onChange={e=>setSearch(e.target.value)}
-                    style={{width:"100%",background:"rgba(255,255,255,0.07)",
-                      border:"1px solid rgba(255,255,255,0.1)",borderRadius:11,
-                      color:"#fff",padding:"10px 14px",fontSize:13,marginBottom:11,
-                      fontFamily:"inherit",outline:"none"}}/>
-
-                  {filtered ? (
-                    filtered.length===0
-                      ? <div style={{textAlign:"center",padding:"16px 0",color:"#334155",fontSize:13}}>No results</div>
-                      : filtered.map(food=><FRow key={food.id} food={food} meal={meal} foodQty={foodQty} setFoodQty={setFoodQty} addFood={addFood}/>)
-                  ) : (
-                    Object.entries(FOOD_OPTIONS).map(([cat,foods])=>{
-                      const open = openCat===cat;
-                      return (
-                        <div key={cat} style={{marginBottom:7}}>
-                          <button onClick={()=>setOpenCat(open?null:cat)}
-                            style={{width:"100%",background:"rgba(255,255,255,0.05)",
-                              border:"1px solid rgba(255,255,255,0.08)",borderRadius:10,
-                              color:"#94A3B8",padding:"9px 12px",fontSize:12,fontWeight:600,
-                              cursor:"pointer",textAlign:"left",fontFamily:"inherit",
-                              display:"flex",justifyContent:"space-between",alignItems:"center",
-                              marginBottom:open?6:0}}>
-                            {cat} <span style={{fontSize:10,color:"#475569"}}>{open?"▲":"▼"}</span>
-                          </button>
-                          {open && foods.map(food=><FRow key={food.id} food={food} meal={meal} foodQty={foodQty} setFoodQty={setFoodQty} addFood={addFood}/>)}
-                        </div>
-                      );
-                    })
-                  )}
-
-                  <button onClick={()=>{setAddingTo(null);setSearch("");setOpenCat(null);}}
-                    style={{width:"100%",padding:10,background:"rgba(255,255,255,0.04)",
-                      border:"1px solid rgba(255,255,255,0.08)",borderRadius:11,
-                      color:"#64748B",fontSize:13,cursor:"pointer",marginTop:8,fontFamily:"inherit"}}>
-                    ✕ Done
-                  </button>
-                </div>
-              ) : (
-                <button onClick={()=>{setAddingTo(meal.id);setSearch("");setOpenCat(null);}}
-                  style={{width:"100%",padding:11,background:`${meal.color}10`,
-                    border:`1px dashed ${meal.color}44`,borderRadius:12,
-                    color:meal.color,fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-                  + Add Food
-                </button>
-              )}
-            </div>
-          ))}
-        </div>}
-
-        {/* ══ ACTIVITY TAB ══ */}
-        {tab==="activity" && <div className="fade">
-          <div style={{fontSize:12,color:"#334155",marginBottom:13}}>Log activities for {date===today?"today":date}</div>
-          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
-            {ACTIVITIES.map(act=>(
-              <div key={act.id} style={{background:"rgba(255,255,255,0.03)",
-                border:`1px solid ${act.color}2A`,borderRadius:16,padding:"12px 14px"}}>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                  <div style={{display:"flex",alignItems:"center",gap:10}}>
-                    <span style={{fontSize:24}}>{act.emoji}</span>
-                    <div>
-                      <div style={{fontSize:13,fontWeight:700,color:"#E2E8F0"}}>{act.label}</div>
-                      <div style={{fontSize:10,color:"#475569"}}>{act.calPerUnit} kcal/{act.unit}</div>
-                    </div>
-                  </div>
-                  <div style={{display:"flex",alignItems:"center",gap:6}}>
-                    <input type="number" min="0" step="0.5" placeholder="0"
-                      value={actInput[act.id]||""}
-                      onChange={e=>setActInput(p=>({...p,[act.id]:e.target.value}))}
-                      style={{width:52,background:"rgba(255,255,255,0.08)",
-                        border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,
-                        color:"#fff",padding:"6px 8px",fontSize:13,textAlign:"center",fontFamily:"inherit"}}/>
-                    <span style={{fontSize:10,color:"#475569",minWidth:22}}>{act.unit}</span>
-                    <button onClick={()=>addAct(act)}
-                      style={{background:`${act.color}1A`,border:`1px solid ${act.color}44`,
-                        borderRadius:9,color:act.color,padding:"7px 13px",
-                        fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-                      Log
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {day.activities.length>0 && <div>
-            <div style={{fontSize:10,color:"#334155",textTransform:"uppercase",letterSpacing:1,marginBottom:9}}>✅ Logged</div>
-            {day.activities.map(a=>(
-              <div key={a.logId} style={{display:"flex",justifyContent:"space-between",
-                alignItems:"center",padding:"10px 13px",
-                background:`${a.color}0E`,border:`1px solid ${a.color}2A`,
-                borderRadius:12,marginBottom:7}}>
-                <span style={{fontSize:13}}>{a.emoji} {a.label}</span>
-                <div style={{display:"flex",alignItems:"center",gap:10}}>
-                  <span style={{fontSize:12,color:"#64748B"}}>{a.value} {a.unit}</span>
-                  <span style={{fontSize:13,fontWeight:800,color:"#10B981"}}>−{a.burned} kcal</span>
-                  <button onClick={()=>removeAct(a.logId)}
-                    style={{background:"none",border:"none",cursor:"pointer",color:"#EF4444",fontSize:17,padding:0,fontFamily:"inherit"}}>×</button>
-                </div>
-              </div>
-            ))}
-            <div style={{textAlign:"right",padding:"9px 13px",fontSize:14,fontWeight:800,color:"#10B981"}}>
-              🔥 Total: {totalBurned} kcal
-            </div>
-          </div>}
-        </div>}
-
-        {/* ══ SUMMARY TAB ══ */}
-        {tab==="summary" && <div className="fade">
-          {/* Hero */}
-          <div style={{background:"linear-gradient(135deg,rgba(37,99,235,0.16),rgba(16,185,129,0.16))",
-            border:"1px solid rgba(37,99,235,0.28)",borderRadius:22,padding:20,
-            marginBottom:14,textAlign:"center"}}>
-            <div style={{fontSize:10,color:"#64748B",textTransform:"uppercase",letterSpacing:1}}>Net Calories</div>
-            <div style={{fontSize:58,fontWeight:900,letterSpacing:-2,lineHeight:1.05,margin:"6px 0",
-              color:net>DAILY_GOAL?"#EF4444":"#60A5FA"}}>{net}</div>
-            <div style={{fontSize:11,color:"#475569"}}>
-              {DAILY_GOAL-net>0?`${DAILY_GOAL-net} kcal remaining`:`${net-DAILY_GOAL} kcal over goal`}
-            </div>
-            <div style={{display:"flex",justifyContent:"center",gap:22,marginTop:14}}>
-              {[{v:totalFood,l:"Consumed",c:"#F59E0B"},{v:totalBurned,l:"Burned",c:"#10B981"},{v:net,l:"Net",c:"#60A5FA"},{v:day.water,l:"💧 Water",c:"#06B6D4"}].map(s=>(
-                <div key={s.l} style={{textAlign:"center"}}>
-                  <div style={{fontSize:17,fontWeight:800,color:s.c}}>{s.v}</div>
-                  <div style={{fontSize:9,color:"#475569"}}>{s.l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Meals */}
-          {S("Meals Breakdown")}
-          {MEALS.map(m=>{
-            const cals=mealCals(m.id), p=totalFood>0?(cals/totalFood)*100:0;
-            return (
-              <div key={m.id} style={{background:"rgba(255,255,255,0.025)",borderRadius:14,
-                padding:"11px 13px",marginBottom:7,border:`1px solid ${m.color}1A`}}>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-                  <span style={{fontSize:13,fontWeight:700}}>{m.emoji} {m.label}</span>
-                  <span style={{fontSize:13,fontWeight:800,color:m.color}}>{cals} kcal</span>
-                </div>
-                <div style={{height:4,background:"rgba(255,255,255,0.06)",borderRadius:99}}>
-                  <div style={{height:"100%",width:`${p}%`,background:m.color,borderRadius:99,transition:"width 0.5s"}}/>
-                </div>
-                {day.meals[m.id].length>0 && (
-                  <div style={{marginTop:6,fontSize:10,color:"#475569",lineHeight:1.7}}>
-                    {day.meals[m.id].map(i=>`${i.emoji} ${i.name} (${i.totalCal} kcal)`).join("  ·  ")}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Activities */}
-          {day.activities.length>0 && <div style={{marginBottom:14}}>
-            {S("Activities")}
-            <div style={{background:"rgba(16,185,129,0.07)",border:"1px solid rgba(16,185,129,0.18)",borderRadius:14,padding:13}}>
-              {day.activities.map(a=>(
-                <div key={a.logId} style={{display:"flex",justifyContent:"space-between",marginBottom:6,fontSize:13}}>
-                  <span>{a.emoji} {a.label} — {a.value} {a.unit}</span>
-                  <span style={{color:"#10B981",fontWeight:700}}>−{a.burned} kcal</span>
-                </div>
-              ))}
-              <div style={{borderTop:"1px solid rgba(255,255,255,0.06)",marginTop:7,paddingTop:7,
-                display:"flex",justifyContent:"space-between",fontSize:14,fontWeight:800}}>
-                <span>Total Burned</span><span style={{color:"#10B981"}}>−{totalBurned} kcal</span>
-              </div>
-            </div>
-          </div>}
-
-          {/* Insight */}
-          <div style={{background:"rgba(139,92,246,0.07)",border:"1px solid rgba(139,92,246,0.2)",borderRadius:14,padding:"13px 15px"}}>
-            <div style={{fontSize:12,fontWeight:700,color:"#A78BFA",marginBottom:5}}>💡 Daily Insight</div>
-            <div style={{fontSize:12,color:"#94A3B8",lineHeight:1.7}}>
-              {totalFood===0?"Start logging meals to see your insight."
-                :net<1200?"⚠️ Calorie intake is low. Make sure you're eating enough."
-                :net>DAILY_GOAL?`You're ${net-DAILY_GOAL} kcal over your goal. A walk or activity can help.`
-                :`✅ On track! ${DAILY_GOAL-net} kcal remaining for the day.`}
-            </div>
-            {day.water<8 && <div style={{marginTop:7,fontSize:11,color:"#67E8F9"}}>💧 {day.water}/8 glasses. Stay hydrated!</div>}
-          </div>
-        </div>}
-
-        {/* ══ HISTORY TAB ══ */}
-        {tab==="history" && <div className="fade">
-          {S("Past Logs")}
-          {histDates.length===0
-            ? <div style={{textAlign:"center",padding:"40px 0",color:"#2D4059",fontSize:14}}>No past data yet.<br/>Start logging today!</div>
-            : histDates.map(d=>{
-                const dx = allData[d]||emptyDay();
-                const fc = Object.values(dx.meals).flat().reduce((s,i)=>s+i.totalCal,0);
-                const bc = dx.activities.reduce((s,a)=>s+a.burned,0);
-                const nc = fc-bc, p=Math.min((fc/DAILY_GOAL)*100,100);
-                return (
-                  <div key={d} onClick={()=>{setDate(d);setTab("summary");}}
-                    style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",
-                      borderRadius:16,padding:"13px 15px",marginBottom:9,cursor:"pointer"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-                      <div>
-                        <div style={{fontSize:13,fontWeight:700,color:"#CBD5E1"}}>
-                          {new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})}
-                        </div>
-                        <div style={{fontSize:10,color:"#475569",marginTop:2}}>{dx.activities.map(a=>a.emoji).join(" ")||"No activities"}</div>
-                      </div>
-                      <div style={{textAlign:"right"}}>
-                        <div style={{fontSize:15,fontWeight:800,color:nc>DAILY_GOAL?"#EF4444":"#60A5FA"}}>{nc} <span style={{fontSize:10,fontWeight:400,color:"#475569"}}>net</span></div>
-                        <div style={{fontSize:10,color:"#475569",marginTop:2}}>💧{dx.water} · 🔥{bc} burned</div>
-                      </div>
-                    </div>
-                    <div style={{height:3,background:"rgba(255,255,255,0.05)",borderRadius:99}}>
-                      <div style={{height:"100%",width:`${p}%`,borderRadius:99,
-                        background:p>=100?"linear-gradient(90deg,#F59E0B,#EF4444)":"linear-gradient(90deg,#10B981,#3B82F6)"}}/>
-                    </div>
-                  </div>
-                );
-              })
-          }
-        </div>}
-
+      <div class="accordion-body" id="body-breakfast">
+        <div id="rows-breakfast"></div>
+        <div class="tip-box" style="background:#EFF6FF;color:#1E40AF">💡 Boiled or poached eggs — high-protein start that keeps you full till lunch.</div>
       </div>
-
-      {/* BOTTOM NAV */}
-      <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:200,
-        background:"rgba(13,27,42,0.97)",backdropFilter:"blur(20px)",
-        borderTop:"1px solid rgba(255,255,255,0.07)",
-        padding:"8px 0 max(8px,env(safe-area-inset-bottom))"}}>
-        <div style={{maxWidth:520,margin:"0 auto",display:"flex"}}>
-          {[{id:"food",ico:"🍽",l:"Food"},{id:"activity",ico:"🏋️",l:"Activity"},
-            {id:"summary",ico:"📊",l:"Summary"},{id:"history",ico:"📅",l:"History"}].map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)}
-              style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2,
-                padding:"6px 0",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"}}>
-              <span style={{fontSize:20}}>{t.ico}</span>
-              <span style={{fontSize:9,fontWeight:700,letterSpacing:0.3,
-                color:tab===t.id?"#60A5FA":"#334155"}}>{t.l}</span>
-              {tab===t.id && <div style={{width:18,height:2,background:"#2563EB",borderRadius:99,marginTop:1}}/>}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Clear Day confirm */}
-      {clearDlg && (
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.75)",zIndex:500,
-          display:"flex",alignItems:"center",justifyContent:"center",padding:24}}>
-          <div style={{background:"#172539",border:"1px solid rgba(239,68,68,0.3)",
-            borderRadius:20,padding:24,maxWidth:320,width:"100%",textAlign:"center"}}>
-            <div style={{fontSize:36,marginBottom:10}}>🗑</div>
-            <div style={{fontSize:15,fontWeight:700,marginBottom:6}}>Clear this day?</div>
-            <div style={{fontSize:12,color:"#64748B",marginBottom:20}}>
-              All data for {date===today?"today":date} will be permanently deleted.
-            </div>
-            <div style={{display:"flex",gap:10}}>
-              <button onClick={()=>setClearDlg(false)}
-                style={{flex:1,padding:11,background:"rgba(255,255,255,0.05)",
-                  border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,
-                  color:"#94A3B8",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:600}}>Cancel</button>
-              <button onClick={clearDay}
-                style={{flex:1,padding:11,background:"rgba(239,68,68,0.15)",
-                  border:"1px solid rgba(239,68,68,0.3)",borderRadius:12,
-                  color:"#EF4444",fontSize:13,cursor:"pointer",fontFamily:"inherit",fontWeight:700}}>Clear</button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
-  );
-}
-
-function FRow({food,meal,foodQty,setFoodQty,addFood}) {
-  return (
-    <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 10px",
-      background:"rgba(255,255,255,0.04)",borderRadius:10,marginBottom:5}}>
-      <input type="number" min="0.5" step="0.5" placeholder="qty"
-        value={foodQty[food.id]||""}
-        onChange={e=>setFoodQty(p=>({...p,[food.id]:e.target.value}))}
-        style={{width:48,background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.1)",
-          borderRadius:7,color:"#fff",padding:"5px 7px",fontSize:12,textAlign:"center",fontFamily:"inherit"}}/>
-      <div style={{flex:1}}>
-        <div style={{fontSize:13,fontWeight:600}}>{food.emoji} {food.name}</div>
-        <div style={{fontSize:10,color:"#475569"}}>{food.cal} kcal / {food.unit}</div>
+    <!-- Accordion: Lunch -->
+    <div class="accordion" id="acc-lunch">
+      <div class="accordion-hdr" onclick="toggleAccordion('lunch')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">☀️</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#1E3A5F">Lunch</div>
+            <div style="font-size:11px;color:#94A3B8" id="acc-lunch-sub">~600 kcal</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cal-pill" style="color:#0891B2;background:#ECFEFF" id="acc-lunch-cal">—</span>
+          <span class="chevron open" id="chev-lunch">▾</span>
+        </div>
       </div>
-      <button onClick={()=>addFood(meal.id,food)}
-        style={{background:`${meal.color}1A`,border:`1px solid ${meal.color}44`,
-          borderRadius:9,color:meal.color,padding:"7px 14px",
-          fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-        Add
-      </button>
+      <div class="accordion-body" id="body-lunch">
+        <div id="rows-lunch"></div>
+        <div class="tip-box" style="background:#ECFEFF;color:#0E7490" id="tip-lunch"></div>
+      </div>
     </div>
-  );
+    <!-- Accordion: Dinner -->
+    <div class="accordion" id="acc-dinner">
+      <div class="accordion-hdr" onclick="toggleAccordion('dinner')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">🌙</span>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#1E3A5F">Dinner</div>
+            <div style="font-size:11px;color:#94A3B8" id="acc-dinner-sub">~600 kcal</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cal-pill" style="color:#1E3A5F;background:#EEF4FB" id="acc-dinner-cal">—</span>
+          <span class="chevron open" id="chev-dinner">▾</span>
+        </div>
+      </div>
+      <div class="accordion-body" id="body-dinner">
+        <div id="rows-dinner"></div>
+        <div class="tip-box" style="background:#EEF4FB;color:#334155" id="tip-dinner"></div>
+      </div>
+    </div>
+    <!-- Day calorie banner -->
+    <div style="background:linear-gradient(135deg,#1E3A5F,#2563EB);border-radius:16px;padding:12px 16px;margin-bottom:12px;color:#fff" id="planBanner"></div>
+    <!-- Craving Busters — always visible -->
+    <div style="background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(30,58,95,0.08);border:1.5px dashed #6EE7B7">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:14px;font-weight:700;color:#059669">🍃 Craving Busters</span>
+        <span style="font-size:9px;font-weight:700;color:#059669;background:#D1FAE5;padding:2px 8px;border-radius:99px">OPTIONAL</span>
+      </div>
+      <div style="font-size:11px;color:#64748B;margin-bottom:10px">Pick <strong>one only</strong> if hunger strikes between meals:</div>
+      <div class="craving-grid">
+        <div class="craving-card">
+          <div style="font-size:28px">🍞</div>
+          <div style="font-size:12px;font-weight:700;color:#1E3A5F;margin-top:6px">Bread Slice</div>
+          <div style="font-size:11px;color:#94A3B8">Whole wheat</div>
+          <div style="font-size:16px;font-weight:800;color:#059669;margin-top:4px">80 kcal</div>
+        </div>
+        <div class="craving-card">
+          <div style="font-size:28px">🌰</div>
+          <div style="font-size:12px;font-weight:700;color:#1E3A5F;margin-top:6px">Almonds 25g</div>
+          <div style="font-size:11px;color:#94A3B8">~20 almonds</div>
+          <div style="font-size:16px;font-weight:800;color:#059669;margin-top:4px">170 kcal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ─── HISTORY TAB ─── -->
+  <div class="tab fade" id="tab-history">
+    <div id="historyContent"></div>
+  </div>
+</div>
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bnav-inner">
+    <button class="bnav-btn active" onclick="switchTab('log',null,this)" id="bnav-log">
+      <span style="font-size:20px">📋</span><span class="bnav-lbl">Log</span><div class="bnav-dot"></div>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('activity',null,this)" id="bnav-activity">
+      <span style="font-size:20px">🏃</span><span class="bnav-lbl">Activity</span><div class="bnav-dot"></div>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('plan',null,this)" id="bnav-plan">
+      <span style="font-size:20px">🥗</span><span class="bnav-lbl">Plan</span><div class="bnav-dot"></div>
+    </button>
+    <button class="bnav-btn" onclick="switchTab('history',null,this)" id="bnav-history">
+      <span style="font-size:20px">📅</span><span class="bnav-lbl">History</span><div class="bnav-dot"></div>
+    </button>
+  </div>
+</div>
+<!-- ═══════════ SCRIPT ═══════════ -->
+<script>/* ── Constants ── */
+const RESTING_ENERGY = 2200;
+const INTAKE_TARGET  = 1600;
+const STORAGE_KEY    = "vitallog_v7";
+const FOODS = [
+{ id:"full_egg",      name:"Full Egg",         emoji:"🥚", cal:70,  unit:"pc",    note:"~70 kcal each" },
+{ id:"egg_white",     name:"Egg White",        emoji:"⬜", cal:17,  unit:"pc",    note:"~17 kcal each" },
+{ id:"rice",          name:"Rice",             emoji:"🍚", cal:45,  unit:"spoon", note:"~45 kcal / spoon (~30g cooked)" },
+{ id:"millet",        name:"Millet",           emoji:"🌿", cal:40,  unit:"spoon", note:"~40 kcal / spoon (~30g cooked)" },
+{ id:"vegetables",    name:"Vegetables",       emoji:"🥦", cal:50,  unit:"cup",   note:"~50 kcal/cup" },
+{ id:"chicken",       name:"Chicken Breast",   emoji:"🍗", cal:165, unit:"100g",  note:"~165 kcal/100g" },
+{ id:"chicken_curry", name:"Chicken Curry",    emoji:"🍛", cal:180, unit:"100g",  note:"~180 kcal/100g" },
+{ id:"fish",          name:"Fish",             emoji:"🐟", cal:130, unit:"100g",  note:"~130 kcal/100g" },
+{ id:"oats",          name:"Oats",             emoji:"🌾", cal:150, unit:"bowl",  note:"~150 kcal / bowl (~40g dry)" },
+{ id:"oats_shake",    name:"Oats & Nut Shake", emoji:"🥤", cal:220, unit:"glass", note:"~220 kcal (oats+nuts+chia)" },
+{ id:"bread",         name:"Bread Slice",      emoji:"🍞", cal:80,  unit:"slice", note:"~80 kcal/slice" },
+{ id:"badam",         name:"Almonds (Badam)",  emoji:"🌰", cal:170, unit:"25g",   note:"~170 kcal per 25g" },
+{ id:"chapathi",      name:"Chapathi",         emoji:"🫓", cal:70,  unit:"pc",    note:"~70 kcal each (no oil)" },
+{ id:"chicken_tikka", name:"Chicken Tikka",    emoji:"🍢", cal:150, unit:"100g",  note:"~150 kcal/100g (grilled)" },
+];
+const MEAL_SLOTS = [
+{ id:"breakfast", label:"Breakfast", emoji:"🌅", color:"#2563EB", bg:"#EFF6FF", border:"#BFDBFE" },
+{ id:"lunch",     label:"Lunch",     emoji:"☀️",  color:"#0891B2", bg:"#ECFEFF", border:"#A5F3FC" },
+{ id:"dinner",    label:"Dinner",    emoji:"🌙", color:"#1E3A5F", bg:"#EEF4FB", border:"#93C5FD" },
+{ id:"snack",     label:"Snack",     emoji:"🍃", color:"#059669", bg:"#ECFDF5", border:"#6EE7B7" },
+];
+const WEEKDAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const WEEKLY_PLAN = {
+Mon:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Boiled"}]},
+lunch:{cal:598,carb:{emoji:"🍚",name:"Rice (3 spoons / ~90g)",cal:135},veg:{emoji:"🥦",name:"Vegetables (2 cups)",cal:100},protein:{emoji:"🍗",name:"Chicken Breast 220g",cal:363},extras:[],note:"Grilled chicken (220g) + steamed rice + stir-fried greens"},
+dinner:{cal:600,name:"Oats Shake + Chicken",items:[{emoji:"🥤",name:"Oats & Nut Shake",cal:220,note:"Oats + almonds + chia"},{emoji:"🍗",name:"Chicken Breast 200g",cal:330,note:"Air-fried or grilled"},{emoji:"🥦",name:"Vegetables (1 cup)",cal:50,note:"Steamed side"}],tip:"Light shake + lean protein — ideal easy Monday night."}},
+Tue:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Omelette style"}]},
+lunch:{cal:597,carb:{emoji:"🌿",name:"Millet (3 spoons / ~90g)",cal:120},veg:{emoji:"🥦",name:"Vegetables (2 cups)",cal:100},protein:{emoji:"🐟",name:"Fish Fillet 200g",cal:260},extras:[{emoji:"🌰",name:"Almonds 20g",cal:136,note:"Healthy fats to fill gap"}],note:"Pan-seared fish + millet + vegetables + almonds for healthy fats"},
+dinner:{cal:600,name:"Chicken Air Fry + Rice",items:[{emoji:"🍗",name:"Chicken Breast 200g",cal:330,note:"Air-fried with herbs"},{emoji:"🍚",name:"Rice (2 spoons / ~60g)",cal:90,note:"Steamed"},{emoji:"🥦",name:"Vegetables (2 cups)",cal:100,note:"Stir-fried"},{emoji:"🍞",name:"1 Bread Slice",cal:80,note:"Whole wheat"}],tip:"Marinate chicken with lemon, garlic & pepper before air-frying."}},
+Wed:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Boiled"}]},
+lunch:{cal:598,carb:{emoji:"🍚",name:"Rice (3 spoons / ~90g)",cal:135},veg:{emoji:"🥦",name:"Vegetables (2 cups)",cal:100},protein:{emoji:"🍛",name:"Chicken Curry 220g",cal:396},extras:[],note:"Generous chicken curry (220g) + steamed rice + vegetables"},
+dinner:{cal:600,name:"Chicken Salad + Almonds",items:[{emoji:"🍗",name:"Chicken Breast 200g",cal:330,note:"Grilled strips"},{emoji:"🥦",name:"Vegetables (2 cups)",cal:100,note:"Fresh greens + cherry tomatoes"},{emoji:"🌰",name:"Almonds 25g",cal:170,note:"Toasted on the side"}],tip:"Use olive oil + lemon dressing. Toss almonds in just before eating."}},
+Thu:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Omelette style"}]},
+lunch:{cal:600,carb:{emoji:"🌿",name:"Millet (3 spoons / ~90g)",cal:120},veg:{emoji:"🥦",name:"Vegetables (3 cups)",cal:150},protein:{emoji:"🍗",name:"Chicken Breast 220g",cal:363},extras:[],note:"Millet + grilled chicken (220g) + extra vegetables for volume"},
+dinner:{cal:600,name:"Fish Air Fry + Rice + Oats",items:[{emoji:"🐟",name:"Fish Fillet 200g",cal:260,note:"Air-fried, lemon & herb"},{emoji:"🍚",name:"Rice (2 spoons / ~60g)",cal:90,note:"Steamed"},{emoji:"🥦",name:"Vegetables (2 cups)",cal:100,note:"Steamed"},{emoji:"🌾",name:"Oats (1 bowl / ~40g dry)",cal:150,note:"Plain cooked oats"}],tip:"Use tilapia or salmon. Squeeze lime over before serving."}},
+Fri:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Boiled"}]},
+lunch:{cal:599,carb:{emoji:"🍚",name:"Rice (3 spoons / ~90g)",cal:135},veg:{emoji:"🥦",name:"Vegetables (3 cups)",cal:150},protein:{emoji:"🐟",name:"Fish Fillet 200g",cal:260},extras:[{emoji:"🌰",name:"Almonds 8g",cal:54,note:"Handful for healthy fats"}],note:"Steamed rice + fish fillet + extra vegetables + small handful almonds"},
+dinner:{cal:602,name:"Chicken Curry + Rice",items:[{emoji:"🍛",name:"Chicken Curry 200g",cal:360,note:"Light curry base"},{emoji:"🍚",name:"Rice (2 spoons / ~60g)",cal:90,note:"Steamed"},{emoji:"🥦",name:"Vegetables (1 cup)",cal:50,note:"Stir-fried"},{emoji:"🌰",name:"Almonds 15g",cal:102,note:"Side of nuts"}],tip:"Use minimal oil in the curry. Season with ginger & turmeric for taste."}},
+Sat:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Omelette style"}]},
+lunch:{cal:598,carb:{emoji:"🌿",name:"Millet (3 spoons / ~90g)",cal:120},veg:{emoji:"🥦",name:"Vegetables (2 cups)",cal:100},protein:{emoji:"🍛",name:"Chicken Curry 210g",cal:378},extras:[],note:"Millet + generous chicken curry (210g) — weekend comfort meal"},
+dinner:{cal:600,name:"Chicken Air Fry + Rice",items:[{emoji:"🍗",name:"Chicken Breast 200g",cal:330,note:"Air-fried, clean & lean"},{emoji:"🍚",name:"Rice (2 spoons / ~60g)",cal:90,note:"Steamed"},{emoji:"🥦",name:"Vegetables (2 cups)",cal:100,note:"Stir-fried"},{emoji:"🍞",name:"1 Bread Slice",cal:80,note:"Whole wheat"}],tip:"Prep chicken in advance. Reheat in air fryer for 3 mins."}},
+Sun:{
+breakfast:{cal:104,items:[{emoji:"🥚",name:"1 Full Egg",cal:70,note:"Boiled or poached"},{emoji:"⬜",name:"2 Egg Whites",cal:34,note:"Boiled"}]},
+lunch:{cal:598,carb:{emoji:"🍚",name:"Rice (3 spoons / ~90g)",cal:135},veg:{emoji:"🥦",name:"Vegetables (2 cups)",cal:100},protein:{emoji:"🍗",name:"Chicken Breast 220g",cal:363},extras:[],note:"Sunday batch cook — rice & chicken (220g) for the week ahead"},
+dinner:{cal:600,name:"Oats Shake + Chicken",items:[{emoji:"🥤",name:"Oats & Nut Shake",cal:220,note:"Almonds + chia + honey"},{emoji:"🍗",name:"Chicken Breast 200g",cal:330,note:"Grilled or air-fried"},{emoji:"🥦",name:"Vegetables (1 cup)",cal:50,note:"Light steamed side"}],tip:"Prep overnight oats on Saturday for an easier Sunday dinner."}}};
+/* ── State ── */
+let allData = {};
+let currentDate  = todayStr();
+let openMealId   = null;
+let checkedFoods = {};
+let foodQtys     = {};
+let selectedPlanDay  = "";
+let currentTopTab    = "log";
+let accordionOpen    = { breakfast:true, lunch:true, dinner:true };
+/* ── Storage ── */
+function loadData(){ try{ allData=JSON.parse(localStorage.getItem(STORAGE_KEY))||{}; }catch{ allData={}; } }
+function saveData(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(allData)); }catch{} }
+function emptyDay(){ return { meals:{breakfast:[],lunch:[],dinner:[],snack:[]}, walk:0, run:0 }; }
+function getDay(d){ if(!allData[d]) allData[d]=emptyDay(); return allData[d]; }
+/* ── Helpers ── */
+function todayStr(){ return new Date().toISOString().split("T")[0]; }
+function fmtDate(d){ return new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"}); }
+function getDayName(ds){ return new Date(ds+"T12:00:00").toLocaleDateString("en-US",{weekday:"short"}).slice(0,3); }
+function mealTotal(arr){ return arr.reduce((s,i)=>s+i.totalCal,0); }
+function foodTotal(day){ return Object.values(day.meals).reduce((s,arr)=>s+mealTotal(arr),0); }
+function walkBurn(day){ return Math.round((day.walk||0)*55); }
+function runBurn(day){  return Math.round((day.run||0)*70); }
+function activeEnergy(day){ return walkBurn(day)+runBurn(day); }
+function totalEnergy(day){ return RESTING_ENERGY+activeEnergy(day); }
+function energyDeficit(day){ return totalEnergy(day)-foodTotal(day); }
+function uid(){ return Date.now()+"-"+Math.random().toString(36).slice(2); }
+let toastTimer=null;
+let activityDebounceTimer=null;
+function debounce(fn,ms){ return function(...args){ clearTimeout(activityDebounceTimer); activityDebounceTimer=setTimeout(()=>fn.apply(this,args),ms); }; }
+function showToast(msg,color="#1D4ED8"){
+const t=document.getElementById("toast");
+t.textContent=msg; t.style.background=color; t.classList.add("show");
+if(toastTimer) clearTimeout(toastTimer);
+toastTimer=setTimeout(()=>t.classList.remove("show"),2200);}
+/* ── Tab switching ── */
+function switchTab(tabId, headerBtn, bnavBtn){
+document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
+document.querySelectorAll(".nav-btn").forEach(el=>el.classList.remove("active"));
+document.querySelectorAll(".bnav-btn").forEach(el=>el.classList.remove("active"));
+document.getElementById("tab-"+tabId).classList.add("active");
+currentTopTab = tabId;
+if(headerBtn) headerBtn.classList.add("active");
+else document.querySelectorAll(".nav-btn").forEach(b=>{ if(b.getAttribute("onclick")&&b.getAttribute("onclick").includes("'"+tabId+"'")) b.classList.add("active"); });
+if(bnavBtn) bnavBtn.classList.add("active");
+else { const b=document.getElementById("bnav-"+tabId); if(b) b.classList.add("active"); }
+if(tabId==="history") renderHistory();
+if(tabId==="plan")    renderPlanTab();}
+/* ── Header update ── */
+function updateHeader(){
+const day = getDay(currentDate);
+const ae  = activeEnergy(day);
+const te  = totalEnergy(day);
+const ci  = foodTotal(day);
+const def = energyDeficit(day);
+const pct = Math.min((ci/INTAKE_TARGET)*100,100);
+let dtxt = fmtDate(currentDate);
+if(currentDate===todayStr()) dtxt+=' <span style="margin-left:7px;background:rgba(255,255,255,0.2);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700">TODAY</span>';
+document.getElementById("headerDate").innerHTML = dtxt;
+document.getElementById("statActive").textContent    = ae;
+document.getElementById("statActiveSub").textContent = ae>0?(day.walk>0&&day.run>0?"Walk+Run":day.walk>0?"Walking":"Running"):"No activity";
+document.getElementById("statTotal").textContent     = te;
+document.getElementById("statIntake").textContent    = ci;
+const dv=document.getElementById("deficitVal"),dl=document.getElementById("deficitLbl"),ds=document.getElementById("deficitSub"),di=document.getElementById("deficitIcon");
+dv.textContent=Math.abs(def);
+if(def>0){ dv.style.color="#86EFAC"; dl.textContent="Energy Deficit"; ds.textContent="kcal · on track 💪"; ds.style.color="rgba(255,255,255,0.5)"; di.textContent="✅"; }
+else if(def===0){ dv.style.color="#FCD34D"; dl.textContent="Break Even"; ds.textContent="kcal · balanced"; ds.style.color="rgba(255,255,255,0.5)"; di.textContent="⚖️"; }
+else { dv.style.color="#FCA5A5"; dl.textContent="Energy Surplus"; ds.textContent="kcal · over target"; ds.style.color="#FCA5A5"; di.textContent="⚠️"; }
+const pb=document.getElementById("progressBar");
+pb.style.width=pct+"%";
+pb.style.background=ci>INTAKE_TARGET?"linear-gradient(90deg,#F59E0B,#EF4444)":"linear-gradient(90deg,#86EFAC,#34D399)";
+const pl=document.getElementById("progressLbl");
+pl.textContent=ci+" / "+INTAKE_TARGET;
+pl.style.color=ci>INTAKE_TARGET?"#FCA5A5":"rgba(255,255,255,0.85)";
+const ib=document.getElementById("logInfoBox");
+if(ib) ib.innerHTML=`🔢 <strong>Today:</strong> Resting ${RESTING_ENERGY} + Active ${ae} = Total Burn ${te} kcal &nbsp;·&nbsp; Intake ${ci} kcal &nbsp;·&nbsp; <strong style="color:${def>=0?"#1D4ED8":"#DC2626"}">${def>=0?"Deficit":"Surplus"} ${Math.abs(def)} kcal</strong>`;}
+/* ── Date change ── */
+function onDateChange(val){
+currentDate=val; openMealId=null; checkedFoods={}; foodQtys={};
+renderMealCards(); syncActivityInputs(); updateHeader();
+if(currentTopTab==="history") renderHistory();}
+/* ── Meal cards ── */
+function initFoodState(mealId){
+if(!checkedFoods[mealId]) checkedFoods[mealId]={};
+if(!foodQtys[mealId]){ foodQtys[mealId]={}; FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";}); }}
+function toggleMealPicker(mealId){
+if(openMealId===mealId){ openMealId=null; checkedFoods[mealId]={}; FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";}); }
+else { openMealId=mealId; initFoodState(mealId); }
+renderMealCards();}
+function toggleFoodCheck(mealId,foodId){
+initFoodState(mealId);
+checkedFoods[mealId][foodId]=!checkedFoods[mealId][foodId];
+updatePickerRow(mealId,foodId); updatePickerSummary(mealId);}
+function onQtyChange(mealId,foodId,val){
+initFoodState(mealId);
+checkedFoods[mealId][foodId]=true;
+foodQtys[mealId][foodId]=val;
+updatePickerRow(mealId,foodId); updatePickerSummary(mealId);}
+function updatePickerRow(mealId,foodId){
+const food=FOODS.find(f=>f.id===foodId); if(!food) return;
+const isC=!!(checkedFoods[mealId]&&checkedFoods[mealId][foodId]);
+const qty=parseFloat((foodQtys[mealId]||{})[foodId]||1)||1;
+const meal=MEAL_SLOTS.find(m=>m.id===mealId);
+const row=document.getElementById("frow-"+mealId+"-"+foodId); if(!row) return;
+row.style.background=isC?"#fff":(meal.bg+"80");
+row.style.border="1.5px solid "+(isC?meal.color:meal.border);
+const cb=document.getElementById("cb-"+mealId+"-"+foodId); if(cb) cb.checked=isC;
+const nm=row.querySelector(".food-row-name"); if(nm){nm.style.fontWeight=isC?700:500;nm.style.color=isC?"#1E3A5F":"#475569";}
+const qi=document.getElementById("qty-"+mealId+"-"+foodId);
+if(qi){qi.disabled=!isC;qi.style.background=isC?"#EFF6FF":"#F1F5F9";qi.style.border="1.5px solid "+(isC?meal.color:"#E2E8F0");qi.style.color=isC?"#1E3A5F":"#CBD5E1";}
+const ci=document.getElementById("cal-"+mealId+"-"+foodId);
+if(ci){ci.textContent=Math.round(food.cal*qty);ci.style.color=isC?meal.color:"#CBD5E1";}}
+function updatePickerSummary(mealId){
+const meal=MEAL_SLOTS.find(m=>m.id===mealId);
+const ch=checkedFoods[mealId]||{},qt=foodQtys[mealId]||{};
+const sel=FOODS.filter(f=>ch[f.id]);
+const cnt=sel.length, tot=sel.reduce((s,f)=>s+Math.round(f.cal*(parseFloat(qt[f.id]||1)||1)),0);
+const si=document.getElementById("selInfo-"+mealId);
+const sc=document.getElementById("selCal-"+mealId);
+const ab=document.getElementById("addBtn-"+mealId);
+if(si) si.innerHTML=cnt>0?`<strong style="color:${meal.color}">${cnt}</strong> item${cnt>1?"s":""} selected`:`<span style="color:#CBD5E1">No items selected yet</span>`;
+if(sc){sc.textContent=cnt>0?"+"+tot+" kcal":"";sc.style.color=meal.color;}
+if(ab){ab.disabled=cnt===0;ab.style.background=cnt>0?meal.color:"#E2E8F0";ab.style.color=cnt>0?"#fff":"#94A3B8";ab.style.cursor=cnt>0?"pointer":"default";ab.textContent=cnt>0?`Add ${cnt} Item${cnt>1?"s":""} (${tot} kcal)`:"Select items above";}}
+function addSelectedFoods(mealId){
+const ch=checkedFoods[mealId]||{},qt=foodQtys[mealId]||{};
+const entries=FOODS.filter(f=>ch[f.id]).map(f=>({...f,qty:parseFloat(qt[f.id]||1)||1,totalCal:Math.round(f.cal*(parseFloat(qt[f.id]||1)||1)),uid:uid()}));
+if(!entries.length) return;
+const day=getDay(currentDate); day.meals[mealId].push(...entries); saveData();
+showToast("✅ "+entries.length+" item"+(entries.length>1?"s":"")+" added to "+MEAL_SLOTS.find(m=>m.id===mealId).label+"!");
+openMealId=null; checkedFoods[mealId]={}; FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";});
+renderMealCards(); updateHeader(); }
+function removeFood(mealId,itemUid){
+const day=getDay(currentDate); day.meals[mealId]=day.meals[mealId].filter(i=>i.uid!==itemUid);
+saveData(); renderMealCards(); updateHeader();}
+function renderMealCards(){
+const container=document.getElementById("mealCards"); container.innerHTML="";
+const day=getDay(currentDate);
+MEAL_SLOTS.forEach(meal=>{
+const items=day.meals[meal.id], total=mealTotal(items), isOpen=openMealId===meal.id;
+initFoodState(meal.id);
+const ch=checkedFoods[meal.id]||{},qt=foodQtys[meal.id]||{};
+let iHTML="";
+items.forEach(item=>{
+iHTML+=`<div class="logged-item"><div style="font-size:13px;color:#334155;flex:1">${item.emoji} ${item.name} <span style="color:#94A3B8;font-size:11px">×${item.qty} ${item.unit}</span></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;font-weight:700;color:${meal.color}">${item.totalCal} kcal</span><button class="remove-btn" onclick="removeFood('${meal.id}','${item.uid}')">×</button></div></div>`;});
+let pHTML="";
+if(isOpen){
+let fRowsHTML="";
+FOODS.forEach(food=>{
+const isC=!!ch[food.id],qty=qt[food.id]||"1",rc=Math.round(food.cal*(parseFloat(qty)||1));
+fRowsHTML+=`<div class="food-row ${isC?"checked":""}" id="frow-${meal.id}-${food.id}" style="background:${isC?"#fff":meal.bg+"80"};border:1.5px solid ${isC?meal.color:meal.border}" onclick="toggleFoodCheck('${meal.id}','${food.id}')"><input type="checkbox" id="cb-${meal.id}-${food.id}" ${isC?"checked":""} onclick="event.stopPropagation();toggleFoodCheck('${meal.id}','${food.id}')"/><span style="font-size:20px;flex-shrink:0">${food.emoji}</span><div style="flex:1;min-width:0"><div class="food-row-name" style="font-size:13px;font-weight:${isC?700:500};color:${isC?"#1E3A5F":"#475569"}">${food.name}</div><div style="font-size:10px;color:#94A3B8;margin-top:1px">${food.note}</div></div><div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0"><input type="number" id="qty-${meal.id}-${food.id}" class="qty-input" min="0.5" step="0.5" value="${qty}" ${isC?"":"disabled"} style="background:${isC?"#EFF6FF":"#F1F5F9"};border:1.5px solid ${isC?meal.color:"#E2E8F0"};color:${isC?"#1E3A5F":"#CBD5E1"}" onclick="event.stopPropagation();if(!document.getElementById('cb-${meal.id}-${food.id}').checked){toggleFoodCheck('${meal.id}','${food.id}');}" oninput="onQtyChange('${meal.id}','${food.id}',this.value)"/><span style="font-size:9px;color:#94A3B8">${food.unit}</span></div><div style="min-width:46px;text-align:right;flex-shrink:0"><div id="cal-${meal.id}-${food.id}" style="font-size:13px;font-weight:700;color:${isC?meal.color:"#CBD5E1"}">${rc}</div><div style="font-size:9px;color:#94A3B8">kcal</div></div></div>`;});
+const sC=FOODS.filter(f=>ch[f.id]).length,pC=FOODS.filter(f=>ch[f.id]).reduce((s,f)=>s+Math.round(f.cal*(parseFloat(qt[f.id]||1)||1)),0);
+pHTML=`<div class="picker-wrap" style="border:1px solid ${meal.border}"><div style="margin-bottom:12px"><span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:${meal.bg};color:${meal.color}">☑ Check items · set qty · tap Add All</span></div>${fRowsHTML}<div class="picker-summary" style="border:1px solid ${meal.border}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:12px;color:#64748B" id="selInfo-${meal.id}">${sC>0?`<strong style="color:${meal.color}">${sC}</strong> item${sC>1?"s":""} selected`:`<span style="color:#CBD5E1">No items selected yet</span>`}</div><div style="font-size:13px;font-weight:800;color:${meal.color}" id="selCal-${meal.id}">${sC>0?"+"+pC+" kcal":""}</div></div><div style="display:flex;gap:8px"><button class="cancel-btn" onclick="toggleMealPicker('${meal.id}')">Cancel</button><button class="add-all-btn" id="addBtn-${meal.id}" ${sC===0?"disabled":""} style="background:${sC>0?meal.color:"#E2E8F0"};color:${sC>0?"#fff":"#94A3B8"};cursor:${sC>0?"pointer":"default"}" onclick="addSelectedFoods('${meal.id}')">${sC>0?`Add ${sC} Item${sC>1?"s":""} (${pC} kcal)`:"Select items above"}</button></div></div></div>`;}
+const div=document.createElement("div");
+div.className="meal-card"; div.style.borderLeft="4px solid "+meal.color;
+div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${items.length>0||isOpen?12:0}px"><div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#1E3A5F"><span style="font-size:20px">${meal.emoji}</span>${meal.label}</div><div style="display:flex;align-items:center;gap:8px">${total>0?`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;color:${meal.color};background:${meal.bg}">${total} kcal</span>`:""}<button class="add-toggle" style="background:${isOpen?"#EF4444":meal.color}" onclick="toggleMealPicker('${meal.id}')">${isOpen?"×":"+"}</button></div></div>${iHTML}${pHTML}`;
+container.appendChild(div);});}
+/* ── Activity ── */
+function syncActivityInputs(){
+const day=getDay(currentDate);
+document.getElementById("walkInput").value=day.walk||"";
+document.getElementById("runInput").value=day.run||"";
+updateActivityUI();}
+const onActivityChange = debounce(function(){
+const day=getDay(currentDate);
+day.walk=parseFloat(document.getElementById("walkInput").value)||0;
+day.run=parseFloat(document.getElementById("runInput").value)||0;
+saveData(); updateActivityUI(); updateHeader();},300);
+function updateActivityUI(){
+const day=getDay(currentDate);
+const wb=walkBurn(day),rb=runBurn(day),ae=activeEnergy(day),te=totalEnergy(day);
+document.getElementById("walkBurnVal").textContent=wb;
+document.getElementById("runBurnVal").textContent=rb;
+const sc=document.getElementById("burnSummaryCard"); sc.style.display=(wb>0||rb>0)?"block":"none";
+if(wb>0||rb>0){
+let rows="";
+if(wb>0) rows+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1E3A5F"><span>🚶 Walk ${day.walk} km</span><span style="font-weight:700;color:#0891B2">${wb} kcal</span></div>`;
+if(rb>0) rows+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1E3A5F"><span>🏃 Run ${day.run} km</span><span style="font-weight:700;color:#2563EB">${rb} kcal</span></div>`;
+document.getElementById("burnSummaryRows").innerHTML=rows;
+document.getElementById("totalActiveBurn").textContent=ae+" kcal";
+document.getElementById("totalBurnLabel").textContent=te.toLocaleString()+" kcal";}}
+/* ════ PLAN TAB ════ */
+function renderPlanTab(){
+const todayDay=getDayName(currentDate);
+if(!selectedPlanDay||!WEEKDAYS.includes(selectedPlanDay)) selectedPlanDay=WEEKDAYS.includes(todayDay)?todayDay:"Mon";
+renderDayStrip(todayDay);
+renderPlanBanner();
+renderPlanAccordions();}
+function renderDayStrip(todayDay){
+const strip=document.getElementById("dayStrip"); strip.innerHTML="";
+WEEKDAYS.forEach(d=>{
+const isToday=d===todayDay,isSel=d===selectedPlanDay;
+const btn=document.createElement("button");
+btn.className="day-pill"+(isSel?" active":"")+(isToday&&!isSel?" today-pill":"");
+btn.innerHTML=`<span class="day-pill-lbl">${d}</span>${isToday?`<div class="today-dot"></div>`:`<div style="height:5px"></div>`}`;
+btn.onclick=()=>{ selectedPlanDay=d; renderDayStrip(todayDay); renderPlanBanner(); renderPlanAccordions(); };
+strip.appendChild(btn);});
+document.getElementById("dayStripNote").innerHTML = selectedPlanDay===todayDay
+? `<span style="color:#2563EB;font-weight:700">📍 Viewing today (${selectedPlanDay})</span>`
+: `Today: <strong style="color:#2563EB">${todayDay}</strong> &nbsp;·&nbsp; Viewing: <strong>${selectedPlanDay}</strong>`;}
+function renderPlanBanner(){
+const plan=WEEKLY_PLAN[selectedPlanDay];
+const total=plan.breakfast.cal+plan.lunch.cal+plan.dinner.cal;
+const bar=(lbl,val,col)=>{
+const w=Math.min((val/700)*100,100).toFixed(0);
+return `<div style="margin-bottom:8px">
+<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+<span style="color:rgba(255,255,255,0.65)">${lbl}</span>
+<span style="font-weight:700;color:${col}">${val} kcal</span>
+</div>
+<div style="height:5px;background:rgba(255,255,255,0.12);border-radius:99px;overflow:hidden">
+<div style="height:100%;width:${w}%;background:${col};border-radius:99px;transition:width .4s"></div>
+</div>
+</div>`;};
+document.getElementById("planBanner").innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+<div style="font-size:14px;font-weight:800">${selectedPlanDay}'s Calorie Plan</div>
+<div style="font-size:18px;font-weight:800;color:#86EFAC">${total} kcal</div>
+</div>
+${bar("🌅 Breakfast","104","#93C5FD")}
+${bar("☀️ Lunch",plan.lunch.cal,"#67E8F9")}
+${bar("🌙 Dinner",plan.dinner.cal,"#86EFAC")}
+<div style="display:flex;justify-content:flex-end;margin-top:4px">
+<span style="font-size:10px;color:rgba(255,255,255,0.4)">Breakfast + Lunch + Dinner = ${total} kcal</span>
+</div>`;}
+function renderPlanAccordions(){
+const plan=WEEKLY_PLAN[selectedPlanDay];
+const pRow=(emoji,name,cal,note,color)=>`
+<div class="plan-row">
+<span style="font-size:20px;min-width:28px;flex-shrink:0">${emoji}</span>
+<div style="flex:1;min-width:0">
+<div style="font-size:13px;font-weight:600;color:#1E3A5F">${name}</div>
+${note?`<div style="font-size:11px;color:#94A3B8;margin-top:2px">${note}</div>`:""}
+</div>
+<div style="font-size:13px;font-weight:800;color:${color};flex-shrink:0;padding-left:8px">${cal} kcal</div>
+</div>`;
+document.getElementById("acc-breakfast-cal").textContent=plan.breakfast.cal+" kcal";
+document.getElementById("rows-breakfast").innerHTML=plan.breakfast.items.map(i=>pRow(i.emoji,i.name,i.cal,i.note,"#2563EB")).join("");
+document.getElementById("acc-lunch-cal").textContent=plan.lunch.cal+" kcal";
+document.getElementById("acc-lunch-sub").textContent=selectedPlanDay+" · ~600 kcal";
+const lunchRows=[
+pRow(plan.lunch.carb.emoji,   plan.lunch.carb.name,    plan.lunch.carb.cal,    "Primary carb",     "#0891B2"),
+pRow("🥦",                    "Vegetables (2 cups)",   plan.lunch.veg.cal,     "Mixed / stir-fried","#0891B2"),
+pRow(plan.lunch.protein.emoji,plan.lunch.protein.name, plan.lunch.protein.cal, "Main protein",     "#0891B2"),
+...(plan.lunch.extras||[]).map(e=>pRow(e.emoji,e.name,e.cal,"Extra protein","#0891B2")),
+`<div class="meal-total-row"><span style="font-size:12px;color:#64748B">Total</span><span style="font-size:15px;font-weight:800;color:#0891B2">${plan.lunch.cal} kcal</span></div>`,
+];
+document.getElementById("rows-lunch").innerHTML=lunchRows.join("");
+document.getElementById("tip-lunch").innerHTML="🍽 "+plan.lunch.note;
+document.getElementById("acc-dinner-cal").textContent=plan.dinner.cal+" kcal";
+document.getElementById("acc-dinner-sub").textContent=selectedPlanDay+" · "+plan.dinner.name;
+const dinnerRows=[
+...plan.dinner.items.map(i=>pRow(i.emoji,i.name,i.cal,i.note,"#1E3A5F")),
+`<div class="meal-total-row"><span style="font-size:12px;color:#64748B">Total</span><span style="font-size:15px;font-weight:800;color:#1E3A5F">${plan.dinner.cal} kcal</span></div>`,
+];
+document.getElementById("rows-dinner").innerHTML=dinnerRows.join("");
+document.getElementById("tip-dinner").innerHTML="💡 "+plan.dinner.tip;
+["breakfast","lunch","dinner"].forEach(m=>applyAccordionState(m));}
+function toggleAccordion(mealId){
+accordionOpen[mealId]=!accordionOpen[mealId];
+applyAccordionState(mealId);}
+function applyAccordionState(mealId){
+const body=document.getElementById("body-"+mealId);
+const chev=document.getElementById("chev-"+mealId);
+if(!body||!chev) return;
+if(accordionOpen[mealId]){ body.classList.remove("closed"); chev.classList.add("open"); }
+else { body.classList.add("closed"); chev.classList.remove("open"); }}
+function renderWeekTable(todayDay){
+const tbl=document.getElementById("weekTable"); if(!tbl) return;
+tbl.innerHTML=`<tr style="background:#F8FAFC">
+<td style="font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;padding:8px 8px 6px">Day</td>
+<td style="font-size:10px;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.5px;padding:8px 8px 6px">Lunch Protein</td>
+<td style="font-size:10px;font-weight:700;color:#1E3A5F;text-transform:uppercase;letter-spacing:.5px;padding:8px 8px 6px">Dinner</td>
+<td style="font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:.5px;padding:8px 8px 6px;text-align:right">kcal</td>
+</tr>`+WEEKDAYS.map(d=>{
+const p=WEEKLY_PLAN[d],isSel=d===selectedPlanDay,isToday=d===todayDay;
+const dc=p.breakfast.cal+p.lunch.cal+p.dinner.cal;
+return `<tr class="${isSel?"selected-row":""} ${isToday&&!isSel?"today-row":""}" onclick="selectedPlanDay='${d}';renderDayStrip('${todayDay}');renderPlanBanner();renderPlanAccordions();renderWeekTable('${todayDay}')">
+<td style="font-weight:${isSel||isToday?700:500};color:${isSel?"#2563EB":isToday?"#2563EB":"#1E3A5F"}">
+${d}${isToday?`<br/><span style="font-size:9px;color:#0891B2;font-weight:700">today</span>`:""}
+</td>
+<td style="color:#0891B2;font-weight:500">${p.lunch.protein.emoji} ${p.lunch.protein.name}</td>
+<td style="color:#1E3A5F">${p.dinner.items[0].emoji} ${p.dinner.name}</td>
+<td style="font-weight:700;color:${isSel?"#2563EB":"#94A3B8"};text-align:right">${dc}</td>
+</tr>`;}).join("");}
+/* ── History ── */
+function renderHistory(){
+const container=document.getElementById("historyContent");
+const dates=Object.keys(allData).filter(d=>d!==currentDate).sort().reverse().slice(0,10);
+if(!dates.length){container.innerHTML=`<div style="text-align:center;padding:50px 0;color:#94A3B8;font-size:14px"><div style="font-size:40px;margin-bottom:10px">📅</div>No past data yet.<br/>Start logging today!</div>`;return;}
+container.innerHTML=dates.map(d=>{
+const dx=allData[d]||emptyDay(),ci=foodTotal(dx),te=totalEnergy(dx),def=te-ci;
+const pct=Math.min((ci/INTAKE_TARGET)*100,100);
+const actStr=(dx.walk>0?`🚶${dx.walk}km `:"")+(dx.run>0?`🏃${dx.run}km`:"");
+return `<div class="hist-card" style="border-left:4px solid ${def>=0?"#2563EB":"#EF4444"}" onclick="jumpToDate('${d}')">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13px;font-weight:700;color:#1E3A5F">${fmtDate(d)}</div><div style="font-size:11px;color:#94A3B8;margin-top:2px">${actStr||"No activity logged"}</div></div>
+<div style="text-align:right"><div style="font-size:15px;font-weight:800;color:${def>=0?"#2563EB":"#EF4444"}">${def>=0?"−":"+"} ${Math.abs(def)} <span style="font-size:10px;font-weight:400;color:#94A3B8">kcal</span></div><div style="font-size:10px;color:#94A3B8">${def>=0?"deficit":"surplus"}</div></div>
+</div>
+<div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${ci>INTAKE_TARGET?"linear-gradient(90deg,#F59E0B,#EF4444)":"linear-gradient(90deg,#86EFAC,#2563EB)"}"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8"><span>Intake: ${ci} kcal</span><span>Total Burn: ${te} kcal</span></div>
+</div>`;}).join("");}
+function jumpToDate(d){
+currentDate=d; document.getElementById("datePicker").value=d;
+openMealId=null; checkedFoods={}; foodQtys={};
+renderMealCards(); syncActivityInputs(); updateHeader(); switchTab("log");}
+/* ── Clear ── */
+function showClearModal(){
+document.getElementById("clearModalText").textContent=`All food and activity for ${currentDate===todayStr()?"today":currentDate} will be permanently removed.`;
+document.getElementById("clearModal").classList.add("show");}
+function hideClearModal(){ document.getElementById("clearModal").classList.remove("show"); }
+function confirmClear(){
+allData[currentDate]=emptyDay(); saveData();
+openMealId=null; checkedFoods={}; foodQtys={};
+hideClearModal(); renderMealCards(); syncActivityInputs(); updateHeader();
+showToast("Day cleared","#0891B2");}
+/* ── Init ── */
+function init(){
+loadData();
+currentDate=todayStr();
+document.getElementById("datePicker").value=currentDate;
+selectedPlanDay=getDayName(currentDate);
+updateHeader(); renderMealCards(); syncActivityInputs();}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}else{init();}
+// Register Service Worker for instant offline loads
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        // Check for updates every time app opens
+        reg.addEventListener('updatefound', () => {
+          const newSW = reg.installing;
+          newSW.addEventListener('statechange', () => {
+            if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+              showToast('✨ App updated — reload for latest version', '#059669');
+            }
+          });
+        });
+      })
+      .catch(() => {}); // Silently fail if SW not supported
+  });
 }
-
-const circBtn = (c) => ({
-  width:32,height:32,borderRadius:"50%",border:`1px solid ${c}33`,
-  background:`${c}12`,color:c,fontSize:20,cursor:"pointer",padding:0,
-  display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"inherit",lineHeight:1
-});
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
