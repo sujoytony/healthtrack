@@ -151,7 +151,7 @@ button{cursor:pointer;}
     <!-- Password -->
     <input type="password" id="authPassword" class="auth-input" placeholder="Password (min 6 chars)" autocomplete="current-password"/>
     <!-- Submit -->
-    <button class="auth-btn" id="authSubmitBtn" onclick="handleAuth()">
+    <button class="auth-btn" id="authSubmitBtn" onclick="handleAuth()" style="min-height:46px">
       <span id="authBtnLabel">Sign In</span>
     </button>
     <div class="auth-divider">or</div>
@@ -391,7 +391,7 @@ button{cursor:pointer;}
 </div><!-- end appScreen -->
 
 <script>
-// showAuthTab doesn't need Firebase, define it immediately
+// showAuthTab: no Firebase needed, define immediately
 window._authMode = "login";
 window.showAuthTab = function(tab, btn) {
   document.querySelectorAll(".auth-tab").forEach(b => b.classList.remove("active"));
@@ -404,8 +404,16 @@ window.showAuthTab = function(tab, btn) {
   if (errEl) errEl.classList.remove("show");
   window._authMode = tab;
 };
+// Auth functions queue: fire as soon as Firebase module is ready (moduleReady)
+// NOT after login (appReady) — they must work BEFORE the user is logged in
+["handleAuth","handleGoogleAuth"].forEach(fn=>{
+  window[fn]=function(...args){
+    document.addEventListener("moduleReady",()=>window[fn](...args),{once:true});
+  };
+});
+// App UI functions queue: fire after login (appReady)
 // Queue other calls made before the module loads
-["showAuthTab","handleAuth","handleGoogleAuth","handleSignOut","showUserMenu",
+["handleSignOut","showUserMenu",
  "switchTab","onDateChange","showClearModal","hideClearModal","confirmClear",
  "toggleMealPicker","toggleFoodCheck","onQtyChange","addSelectedFoods",
  "removeFood","onActivityChange","toggleAccordion","jumpToDate","stepQty"
@@ -418,7 +426,7 @@ window.showAuthTab = function(tab, btn) {
 <!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ════════════════════════════════════
@@ -438,6 +446,9 @@ const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
+
+// Signal that Firebase is ready — auth buttons can now work
+document.dispatchEvent(new Event("moduleReady"));
 
 // ── Expose to global scope for onclick handlers ──
 window._auth = auth;
@@ -498,13 +509,22 @@ window.handleAuth = async () => {
   }
 };
 
-// ── Google Auth ──
+// ── Google Auth (redirect on mobile, popup on desktop) ──
 window.handleGoogleAuth = async () => {
   document.getElementById("authErr").classList.remove("show");
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch(e) {
-    if (e.code !== "auth/popup-closed-by-user") showAuthErr("Google sign-in failed. Please try again.");
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    try {
+      await signInWithRedirect(auth, googleProvider);
+    } catch(e) {
+      showAuthErr("Google sign-in failed. Please try again.");
+    }
+  } else {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch(e) {
+      if (e.code !== "auth/popup-closed-by-user") showAuthErr("Google sign-in failed. Please try again.");
+    }
   }
 };
 
@@ -579,6 +599,11 @@ async function migrateLocalData(uid) {
     console.warn("Migration failed:", e);
   }
 }
+
+// ── Handle redirect result from Google sign-in on mobile ──
+getRedirectResult(auth).catch(e => {
+  if (e && e.code !== "auth/null-user") console.warn("Redirect result error:", e);
+});
 
 // ── Auth state listener — main entry point ──
 onAuthStateChanged(auth, async (user) => {
