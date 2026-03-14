@@ -391,35 +391,43 @@ button{cursor:pointer;}
 </div><!-- end appScreen -->
 
 <script>
-// showAuthTab: no Firebase needed, define immediately
+/* ── Pre-module shim ── */
 window._authMode = "login";
+
 window.showAuthTab = function(tab, btn) {
-  document.querySelectorAll(".auth-tab").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".auth-tab").forEach(function(b){ b.classList.remove("active"); });
   btn.classList.add("active");
   var nameEl = document.getElementById("authName");
   var lblEl  = document.getElementById("authBtnLabel");
-  if (nameEl) nameEl.style.display = tab === "register" ? "block" : "none";
-  if (lblEl)  lblEl.textContent = tab === "register" ? "Create Account" : "Sign In";
+  if (nameEl) nameEl.style.display = (tab === "register") ? "block" : "none";
+  if (lblEl)  lblEl.textContent    = (tab === "register") ? "Create Account" : "Sign In";
   var errEl = document.getElementById("authErr");
   if (errEl) errEl.classList.remove("show");
   window._authMode = tab;
 };
-// Auth functions queue: fire as soon as Firebase module is ready (moduleReady)
-// NOT after login (appReady) — they must work BEFORE the user is logged in
-["handleAuth","handleGoogleAuth"].forEach(fn=>{
-  window[fn]=function(...args){
-    document.addEventListener("moduleReady",()=>window[fn](...args),{once:true});
-  };
-});
-// App UI functions queue: fire after login (appReady)
-// Queue other calls made before the module loads
-["handleSignOut","showUserMenu",
- "switchTab","onDateChange","showClearModal","hideClearModal","confirmClear",
+
+// Queue handleAuth / handleGoogleAuth until module signals ready
+(function() {
+  var pending = { handleAuth:[], handleGoogleAuth:[] };
+  ["handleAuth","handleGoogleAuth"].forEach(function(fn) {
+    window[fn] = function() { pending[fn].push(Array.from(arguments)); };
+  });
+  document.addEventListener("moduleReady", function() {
+    Object.keys(pending).forEach(function(fn) {
+      pending[fn].forEach(function(args){ window[fn].apply(null, args); });
+    });
+  }, { once:true });
+}());
+
+// Queue app-UI functions until after login
+["switchTab","onDateChange","showClearModal","hideClearModal","confirmClear",
  "toggleMealPicker","toggleFoodCheck","onQtyChange","addSelectedFoods",
- "removeFood","onActivityChange","toggleAccordion","jumpToDate","stepQty"
-].forEach(fn=>{
-  window[fn]=function(...args){
-    document.addEventListener("appReady",()=>window[fn](...args),{once:true});
+ "removeFood","onActivityChange","toggleAccordion","jumpToDate","stepQty",
+ "handleSignOut","showUserMenu"
+].forEach(function(fn) {
+  window[fn] = function() {
+    var a = arguments;
+    document.addEventListener("appReady", function(){ window[fn].apply(null,a); }, {once:true});
   };
 });
 </script>
@@ -447,8 +455,6 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Signal that Firebase is ready — auth buttons can now work
-document.dispatchEvent(new Event("moduleReady"));
 
 // ── Expose to global scope for onclick handlers ──
 window._auth = auth;
@@ -527,6 +533,9 @@ window.handleGoogleAuth = async () => {
     }
   }
 };
+
+// ── Signal module ready — handleAuth & handleGoogleAuth are now defined ──
+document.dispatchEvent(new Event("moduleReady"));
 
 // ── Sign Out ──
 window.handleSignOut = async () => {
