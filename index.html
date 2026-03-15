@@ -390,56 +390,16 @@ button{cursor:pointer;}
 
 </div><!-- end appScreen -->
 
+
+<!-- Firebase Compat SDKs (plain scripts, no modules, no timing issues) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
 <script>
-/* ── Pre-module shim ── */
-window._authMode = "login";
-
-window.showAuthTab = function(tab, btn) {
-  document.querySelectorAll(".auth-tab").forEach(function(b){ b.classList.remove("active"); });
-  btn.classList.add("active");
-  var nameEl = document.getElementById("authName");
-  var lblEl  = document.getElementById("authBtnLabel");
-  if (nameEl) nameEl.style.display = (tab === "register") ? "block" : "none";
-  if (lblEl)  lblEl.textContent    = (tab === "register") ? "Create Account" : "Sign In";
-  var errEl = document.getElementById("authErr");
-  if (errEl) errEl.classList.remove("show");
-  window._authMode = tab;
-};
-
-// Queue handleAuth / handleGoogleAuth until module signals ready
-(function() {
-  var pending = { handleAuth:[], handleGoogleAuth:[] };
-  ["handleAuth","handleGoogleAuth"].forEach(function(fn) {
-    window[fn] = function() { pending[fn].push(Array.from(arguments)); };
-  });
-  document.addEventListener("moduleReady", function() {
-    Object.keys(pending).forEach(function(fn) {
-      pending[fn].forEach(function(args){ window[fn].apply(null, args); });
-    });
-  }, { once:true });
-}());
-
-// Queue app-UI functions until after login
-["switchTab","onDateChange","showClearModal","hideClearModal","confirmClear",
- "toggleMealPicker","toggleFoodCheck","onQtyChange","addSelectedFoods",
- "removeFood","onActivityChange","toggleAccordion","jumpToDate","stepQty",
- "handleSignOut","showUserMenu"
-].forEach(function(fn) {
-  window[fn] = function() {
-    var a = arguments;
-    document.addEventListener("appReady", function(){ window[fn].apply(null,a); }, {once:true});
-  };
-});
-</script>
-<!-- Firebase SDKs -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* ════════════════════════════════════
-   🔧 PASTE YOUR FIREBASE CONFIG HERE
-   ════════════════════════════════════ */
+/* ════════════════════════════════
+   FIREBASE CONFIG
+   ════════════════════════════════ */
 const firebaseConfig = {
   apiKey:            "AIzaSyC0V5GA2qdM-54pXZTX1gdUz4e3sovkbyk",
   authDomain:        "tonys-healthtrack.firebaseapp.com",
@@ -448,44 +408,35 @@ const firebaseConfig = {
   messagingSenderId: "817545571186",
   appId:             "1:817545571186:web:1122c11d8b787ff80f0beb"
 };
-/* ════════════════════════════════════ */
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
 
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
-
-
-// ── Expose to global scope for onclick handlers ──
-window._auth = auth;
-window._db   = db;
-
-// ── Auth tab toggle ──
-window.showAuthTab = (tab, btn) => {
+/* ── Auth tab toggle ── */
+window._authMode = "login";
+window.showAuthTab = function(tab, btn) {
   document.querySelectorAll(".auth-tab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   document.getElementById("authName").style.display    = tab === "register" ? "block" : "none";
-  document.getElementById("authSubmitBtn").querySelector("#authBtnLabel").textContent = tab === "register" ? "Create Account" : "Sign In";
+  document.getElementById("authBtnLabel").textContent  = tab === "register" ? "Create Account" : "Sign In";
   document.getElementById("authErr").classList.remove("show");
   window._authMode = tab;
 };
-window._authMode = "login";
-
-function setAuthLoading(loading) {
-  const btn = document.getElementById("authSubmitBtn");
-  btn.disabled = loading;
-  btn.innerHTML = loading
-    ? `<span class="spinner"></span>Please wait...`
-    : `<span id="authBtnLabel">${window._authMode === "register" ? "Create Account" : "Sign In"}</span>`;
-}
 
 function showAuthErr(msg) {
   const el = document.getElementById("authErr");
   el.textContent = msg; el.classList.add("show");
 }
+function setAuthLoading(on) {
+  const btn = document.getElementById("authSubmitBtn");
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? '<span class="spinner"></span>Please wait...'
+    : '<span id="authBtnLabel">' + (window._authMode === "register" ? "Create Account" : "Sign In") + '</span>';
+}
 
-// ── Email/Password Auth ──
-window.handleAuth = async () => {
+/* ── Email/Password Auth ── */
+window.handleAuth = function() {
   const email    = document.getElementById("authEmail").value.trim();
   const password = document.getElementById("authPassword").value;
   const name     = document.getElementById("authName").value.trim();
@@ -494,164 +445,118 @@ window.handleAuth = async () => {
   if (window._authMode === "register" && !name) return showAuthErr("Please enter your name.");
   if (window._authMode === "register" && password.length < 6) return showAuthErr("Password must be at least 6 characters.");
   setAuthLoading(true);
-  try {
-    if (window._authMode === "register") {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(cred.user, { displayName: name });
-    } else {
-      await signInWithEmailAndPassword(auth, email, password);
-    }
-  } catch(e) {
-    setAuthLoading(false);
-    const msgs = {
-      "auth/email-already-in-use": "Email already registered. Please sign in.",
-      "auth/user-not-found": "No account found with this email.",
-      "auth/wrong-password": "Incorrect password.",
-      "auth/invalid-email": "Please enter a valid email address.",
-      "auth/invalid-credential": "Incorrect email or password.",
-      "auth/too-many-requests": "Too many attempts. Please try again later."
-    };
-    showAuthErr(msgs[e.code] || "Something went wrong. Please try again.");
-  }
-};
-
-// ── Google Auth (redirect on mobile, popup on desktop) ──
-window.handleGoogleAuth = async () => {
-  document.getElementById("authErr").classList.remove("show");
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    try {
-      await signInWithRedirect(auth, googleProvider);
-    } catch(e) {
-      showAuthErr("Google sign-in failed. Please try again.");
-    }
+  if (window._authMode === "register") {
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(function(cred) { return cred.user.updateProfile({ displayName: name }); })
+      .catch(function(e) { setAuthLoading(false); showAuthErr(authErrMsg(e.code)); });
   } else {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch(e) {
-      if (e.code !== "auth/popup-closed-by-user") showAuthErr("Google sign-in failed. Please try again.");
-    }
+    auth.signInWithEmailAndPassword(email, password)
+      .catch(function(e) { setAuthLoading(false); showAuthErr(authErrMsg(e.code)); });
   }
 };
 
-// ── Signal module ready — handleAuth & handleGoogleAuth are now defined ──
-document.dispatchEvent(new Event("moduleReady"));
+function authErrMsg(code) {
+  return ({
+    "auth/email-already-in-use": "Email already registered. Please sign in.",
+    "auth/user-not-found":       "No account found with this email.",
+    "auth/wrong-password":       "Incorrect password.",
+    "auth/invalid-email":        "Please enter a valid email address.",
+    "auth/invalid-credential":   "Incorrect email or password.",
+    "auth/too-many-requests":    "Too many attempts. Please try again later."
+  })[code] || "Something went wrong. Please try again.";
+}
 
-// ── Sign Out ──
-window.handleSignOut = async () => {
-  if (!confirm("Sign out of OneTwo83 Healthtrack?")) return;
-  await signOut(auth);
+/* ── Google Auth ── */
+window.handleGoogleAuth = function() {
+  document.getElementById("authErr").classList.remove("show");
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .catch(function(e) {
+      if (e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") {
+        showAuthErr("Google sign-in failed. Please try again.");
+      }
+    });
 };
 
-window.showUserMenu = () => {
+/* ── Sign Out ── */
+window.handleSignOut = function() {
+  if (!confirm("Sign out of OneTwo83 Healthtrack?")) return;
+  auth.signOut();
+};
+window.showUserMenu = function() {
   const u = auth.currentUser;
   if (!u) return;
-  const name  = u.displayName || u.email;
-  const email = u.email;
-  if (confirm(`Signed in as:
-${name}
-${email}
-
-Sign out?`)) handleSignOut();
+  if (confirm("Signed in as:\n" + (u.displayName||u.email) + "\n" + u.email + "\n\nSign out?")) {
+    window.handleSignOut();
+  }
 };
 
-// ── Firestore helpers ──
-function userLogsRef(uid) { return collection(db, "users", uid, "logs"); }
-function dayRef(uid, date) { return doc(db, "users", uid, "logs", date); }
+/* ── Firestore helpers ── */
+function dayRef(uid, date) { return db.collection("users").doc(uid).collection("logs").doc(date); }
+
+function setSyncDot(state) {
+  const dot = document.getElementById("syncDot");
+  if (!dot) return;
+  dot.style.background = state==="ok"?"#86EFAC":state==="syncing"?"#FCD34D":"#EF4444";
+}
 
 async function loadUserData(uid) {
   setSyncDot("syncing");
   try {
-    const snap = await getDocs(userLogsRef(uid));
+    const snap = await db.collection("users").doc(uid).collection("logs").get();
     const data = {};
     snap.forEach(d => { data[d.id] = d.data(); });
     window.allData = data;
     setSyncDot("ok");
-  } catch(e) {
-    console.warn("Firestore load failed, using local cache", e);
-    setSyncDot("offline");
-  }
+  } catch(e) { setSyncDot("offline"); console.warn("Load failed", e); }
 }
 
 async function saveDayToFirestore(uid, date, dayData) {
   setSyncDot("syncing");
   try {
-    await setDoc(dayRef(uid, date), dayData);
+    await dayRef(uid, date).set(dayData);
     setSyncDot("ok");
-  } catch(e) {
-    setSyncDot("offline");
-    console.warn("Save failed:", e);
-  }
+  } catch(e) { setSyncDot("offline"); console.warn("Save failed", e); }
 }
 
-window._saveDayToFirestore = saveDayToFirestore;
-
-function setSyncDot(state) {
-  const dot = document.getElementById("syncDot");
-  if (!dot) return;
-  dot.style.background = state === "ok" ? "#86EFAC" : state === "syncing" ? "#FCD34D" : "#EF4444";
-}
-
-// ── Migrate localStorage → Firestore ──
 async function migrateLocalData(uid) {
   try {
     const local = JSON.parse(localStorage.getItem("vitallog_v7") || "{}");
-    const keys = Object.keys(local);
+    const keys  = Object.keys(local);
     if (!keys.length) return;
-    const batch = writeBatch(db);
-    keys.forEach(date => { batch.set(dayRef(uid, date), local[date]); });
+    const batch = db.batch();
+    keys.forEach(date => batch.set(dayRef(uid, date), local[date]));
     await batch.commit();
     localStorage.removeItem("vitallog_v7");
     showToast("✅ " + keys.length + " day(s) migrated to cloud!", "#059669");
     Object.assign(window.allData, local);
-  } catch(e) {
-    console.warn("Migration failed:", e);
-  }
+  } catch(e) { console.warn("Migration failed", e); }
 }
 
-// ── Handle redirect result from Google sign-in on mobile ──
-getRedirectResult(auth).catch(e => {
-  if (e && e.code !== "auth/null-user") console.warn("Redirect result error:", e);
-});
-
-// ── Auth state listener — main entry point ──
-onAuthStateChanged(auth, async (user) => {
+/* ── Auth state listener ── */
+auth.onAuthStateChanged(async function(user) {
   if (user) {
-    // Show app
     document.getElementById("authScreen").style.display = "none";
     document.getElementById("appScreen").classList.add("show");
-    // Set user badge
     const name = user.displayName || user.email.split("@")[0];
     document.getElementById("userNameBadge").textContent = name;
-    // Load data
     window.allData = {};
     await loadUserData(user.uid);
-    // Migrate localStorage if exists
     const local = localStorage.getItem("vitallog_v7");
     if (local && Object.keys(JSON.parse(local)).length) await migrateLocalData(user.uid);
-    // Set current user uid globally
     window._currentUid = user.uid;
-    // Boot app
     bootApp();
-    document.dispatchEvent(new Event("appReady"));
   } else {
-    // Show auth
     document.getElementById("authScreen").style.display = "flex";
     document.getElementById("appScreen").classList.remove("show");
     window._currentUid = null;
+    setAuthLoading(false);
   }
 });
 
-// ── Boot app after auth ──
-function bootApp() {
-  window.currentDate  = todayStr();
-  document.getElementById("datePicker").value = window.currentDate;
-  window.selectedPlanDay = getDayName(window.currentDate);
-  updateHeader();
-  renderMealCards();
-  syncActivityInputs();
-}
-
+/* ════════════════════════════════
+   APP CONSTANTS + DATA
+   ════════════════════════════════ */
 const RESTING_ENERGY = 2000;
 const INTAKE_TARGET  = 1600;
 const STORAGE_KEY    = "vitallog_v7";
@@ -716,21 +621,19 @@ lunch:{cal:718,carb:{emoji:"🍚",name:"Rice (3 spoons / ~90g)",cal:162},veg:{em
 dinner:{cal:720,name:"Oats Shake + Chicken",items:[{emoji:"🥤",name:"Oats & Nut Shake",cal:264,note:"Almonds + chia + honey"},{emoji:"🍗",name:"Chicken Breast 200g",cal:396,note:"Grilled or air-fried"},{emoji:"🥦",name:"Vegetables (1 cup)",cal:60,note:"Light steamed side"}],tip:"Prep overnight oats on Saturday for an easier Sunday dinner."}}};
 
 /* ── State ── */
-window.allData = {};
-window.currentDate  = todayStr();
-window._currentUid  = null;
+window.allData     = {};
+window.currentDate = "";
+window._currentUid = null;
 let openMealId   = null;
 let checkedFoods = {};
 let foodQtys     = {};
 window.selectedPlanDay = "";
-let currentTopTab    = "log";
-let accordionOpen    = { breakfast:true, lunch:true, dinner:true };
+let currentTopTab = "log";
+let accordionOpen = { breakfast:true, lunch:true, dinner:true };
 
-/* ── Storage — now writes to Firestore ── */
+/* ── Storage ── */
 function saveData() {
-  if (window._currentUid) {
-    window._saveDayToFirestore(window._currentUid, window.currentDate, window.allData[window.currentDate]);
-  }
+  if (window._currentUid) saveDayToFirestore(window._currentUid, window.currentDate, window.allData[window.currentDate]);
 }
 function emptyDay() { return { meals:{breakfast:[],lunch:[],dinner:[],snack:[]}, walk:0, run:0 }; }
 function getDay(d)  { if(!window.allData[d]) window.allData[d]=emptyDay(); return window.allData[d]; }
@@ -748,15 +651,9 @@ function totalEnergy(day){ return RESTING_ENERGY+activeEnergy(day); }
 function energyDeficit(day){ return totalEnergy(day)-foodTotal(day); }
 function uid(){ return Date.now()+"-"+Math.random().toString(36).slice(2); }
 
-let toastTimer=null;
-let activityDebounceTimer=null;
-function debounce(fn,ms){
-  const wrapped=function(...args){ clearTimeout(activityDebounceTimer); activityDebounceTimer=setTimeout(()=>fn.apply(this,args),ms); };
-  wrapped.flush=function(){ clearTimeout(activityDebounceTimer); fn(); };
-  return wrapped;
-}
+let toastTimer=null, actDebTimer=null;
 window.showToast = function(msg,color){
-  color = color||"#1D4ED8";
+  color=color||"#1D4ED8";
   const t=document.getElementById("toast");
   t.textContent=msg; t.style.background=color; t.classList.add("show");
   if(toastTimer) clearTimeout(toastTimer);
@@ -764,26 +661,32 @@ window.showToast = function(msg,color){
 };
 const showToast = window.showToast;
 
+/* ── Boot ── */
+function bootApp(){
+  window.currentDate = todayStr();
+  document.getElementById("datePicker").value = window.currentDate;
+  window.selectedPlanDay = getDayName(window.currentDate);
+  updateHeader(); renderMealCards(); syncActivityInputs();
+}
+
 /* ── Tab switching ── */
-function switchTab(tabId, headerBtn, bnavBtn){
+window.switchTab = function(tabId,headerBtn,bnavBtn){
   document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(el=>el.classList.remove("active"));
   document.querySelectorAll(".bnav-btn").forEach(el=>el.classList.remove("active"));
   document.getElementById("tab-"+tabId).classList.add("active");
-  currentTopTab = tabId;
+  currentTopTab=tabId;
   if(headerBtn) headerBtn.classList.add("active");
   else document.querySelectorAll(".nav-btn").forEach(b=>{ if(b.getAttribute("onclick")&&b.getAttribute("onclick").includes("'"+tabId+"'")) b.classList.add("active"); });
   if(bnavBtn) bnavBtn.classList.add("active");
   else { const b=document.getElementById("bnav-"+tabId); if(b) b.classList.add("active"); }
   if(tabId==="history") renderHistory();
   if(tabId==="plan")    renderPlanTab();
-}
-window.switchTab = switchTab;
+};
 
 /* ── Header ── */
 function updateHeader(){
-  const day=getDay(window.currentDate);
-  const ae=activeEnergy(day),te=totalEnergy(day),ci=foodTotal(day),def=energyDeficit(day);
+  const day=getDay(window.currentDate),ae=activeEnergy(day),te=totalEnergy(day),ci=foodTotal(day),def=energyDeficit(day);
   const pct=Math.min((ci/INTAKE_TARGET)*100,100);
   let dtxt=fmtDate(window.currentDate);
   if(window.currentDate===todayStr()) dtxt+=' <span style="margin-left:7px;background:rgba(255,255,255,0.2);color:#fff;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700">TODAY</span>';
@@ -804,59 +707,55 @@ function updateHeader(){
   pl.textContent=ci+" / "+INTAKE_TARGET;
   pl.style.color=ci>INTAKE_TARGET?"#FCA5A5":"rgba(255,255,255,0.85)";
   const ib=document.getElementById("logInfoBox");
-  if(ib) ib.innerHTML=\`🔢 <strong>Today:</strong> Resting \${RESTING_ENERGY} + Active \${ae} = Total Burn \${te} kcal &nbsp;·&nbsp; Intake \${ci} kcal &nbsp;·&nbsp; <strong style="color:\${def>=0?"#1D4ED8":"#DC2626"}">\${def>=0?"Deficit":"Surplus"} \${Math.abs(def)} kcal</strong>\`;
+  if(ib) ib.innerHTML=`🔢 <strong>Today:</strong> Resting ${RESTING_ENERGY} + Active ${ae} = Total Burn ${te} kcal &nbsp;·&nbsp; Intake ${ci} kcal &nbsp;·&nbsp; <strong style="color:${def>=0?"#1D4ED8":"#DC2626"}">${def>=0?"Deficit":"Surplus"} ${Math.abs(def)} kcal</strong>`;
 }
 
 /* ── Date change ── */
-function onDateChange(val){
+window.onDateChange = function(val){
   window.currentDate=val; openMealId=null; checkedFoods={}; foodQtys={};
   renderMealCards(); syncActivityInputs(); updateHeader();
   if(currentTopTab==="history") renderHistory();
-}
-window.onDateChange = onDateChange;
+};
 
 /* ── Meal cards ── */
 function initFoodState(mealId){
   if(!checkedFoods[mealId]) checkedFoods[mealId]={};
-  if(!foodQtys[mealId]){foodQtys[mealId]={};FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";});}
+  if(!foodQtys[mealId]){ foodQtys[mealId]={}; FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";}); }
 }
-function toggleMealPicker(mealId){
+window.toggleMealPicker = function(mealId){
   if(openMealId===mealId){openMealId=null;checkedFoods[mealId]={};FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";});}
   else{openMealId=mealId;initFoodState(mealId);}
   renderMealCards();
-}
-window.toggleMealPicker=toggleMealPicker;
-function toggleFoodCheck(mealId,foodId){
-  initFoodState(mealId);checkedFoods[mealId][foodId]=!checkedFoods[mealId][foodId];
-  updatePickerRow(mealId,foodId);updatePickerSummary(mealId);
-}
-window.toggleFoodCheck=toggleFoodCheck;
-function onQtyChange(mealId,foodId,val){
-  initFoodState(mealId);checkedFoods[mealId][foodId]=true;foodQtys[mealId][foodId]=val;
-  updatePickerRow(mealId,foodId);updatePickerSummary(mealId);
-}
-window.onQtyChange=onQtyChange;
-function stepQty(mealId,foodId,delta){
+};
+window.toggleFoodCheck = function(mealId,foodId){
+  initFoodState(mealId); checkedFoods[mealId][foodId]=!checkedFoods[mealId][foodId];
+  updatePickerRow(mealId,foodId); updatePickerSummary(mealId);
+};
+window.onQtyChange = function(mealId,foodId,val){
+  initFoodState(mealId); checkedFoods[mealId][foodId]=true; foodQtys[mealId][foodId]=val;
+  updatePickerRow(mealId,foodId); updatePickerSummary(mealId);
+};
+window.stepQty = function(mealId,foodId,delta){
   initFoodState(mealId);
   const cur=parseFloat(foodQtys[mealId][foodId]||1)||1;
   const next=Math.max(0.5,Math.round((cur+delta)*2)/2);
   foodQtys[mealId][foodId]=String(next);
   checkedFoods[mealId][foodId]=true;
-  updatePickerRow(mealId,foodId);updatePickerSummary(mealId);
-}
-window.stepQty=stepQty;
+  updatePickerRow(mealId,foodId); updatePickerSummary(mealId);
+};
+
 function updatePickerRow(mealId,foodId){
-  const food=FOODS.find(f=>f.id===foodId);if(!food)return;
+  const food=FOODS.find(f=>f.id===foodId); if(!food) return;
   const isC=!!(checkedFoods[mealId]&&checkedFoods[mealId][foodId]);
   const qty=parseFloat((foodQtys[mealId]||{})[foodId]||1)||1;
   const meal=MEAL_SLOTS.find(m=>m.id===mealId);
-  const row=document.getElementById("frow-"+mealId+"-"+foodId);if(!row)return;
+  const row=document.getElementById("frow-"+mealId+"-"+foodId); if(!row) return;
   row.style.background=isC?"#fff":(meal.bg+"80");
   row.style.border="1.5px solid "+(isC?meal.color:meal.border);
-  const cb=document.getElementById("cb-"+mealId+"-"+foodId);if(cb)cb.checked=isC;
-  const nm=row.querySelector(".food-row-name");if(nm){nm.style.fontWeight=isC?700:500;nm.style.color=isC?"#1E3A5F":"#475569";}
-  const qi=document.getElementById("qty-"+mealId+"-"+foodId);
-  if(qi){qi.textContent=qty;}
+  const cb=document.getElementById("cb-"+mealId+"-"+foodId); if(cb) cb.checked=isC;
+  const nm=row.querySelector(".food-row-name"); if(nm){nm.style.fontWeight=isC?700:500;nm.style.color=isC?"#1E3A5F":"#475569";}
+  const qv=document.getElementById("qty-"+mealId+"-"+foodId);
+  if(qv) qv.textContent=qty;
   const dec=document.getElementById("dec-"+mealId+"-"+foodId);
   const inc=document.getElementById("inc-"+mealId+"-"+foodId);
   if(dec){dec.disabled=!isC;dec.style.background=isC?meal.bg:"#F1F5F9";dec.style.color=isC?meal.color:"#CBD5E1";}
@@ -864,6 +763,7 @@ function updatePickerRow(mealId,foodId){
   const ci=document.getElementById("cal-"+mealId+"-"+foodId);
   if(ci){ci.textContent=Math.round(food.cal*qty);ci.style.color=isC?meal.color:"#CBD5E1";}
 }
+
 function updatePickerSummary(mealId){
   const meal=MEAL_SLOTS.find(m=>m.id===mealId);
   const ch=checkedFoods[mealId]||{},qt=foodQtys[mealId]||{};
@@ -872,47 +772,48 @@ function updatePickerSummary(mealId){
   const si=document.getElementById("selInfo-"+mealId);
   const sc=document.getElementById("selCal-"+mealId);
   const ab=document.getElementById("addBtn-"+mealId);
-  if(si)si.innerHTML=cnt>0?\`<strong style="color:\${meal.color}">\${cnt}</strong> item\${cnt>1?"s":""} selected\`:\`<span style="color:#CBD5E1">No items selected yet</span>\`;
+  if(si) si.innerHTML=cnt>0?`<strong style="color:${meal.color}">${cnt}</strong> item${cnt>1?"s":""} selected`:`<span style="color:#CBD5E1">No items selected yet</span>`;
   if(sc){sc.textContent=cnt>0?"+"+tot+" kcal":"";sc.style.color=meal.color;}
-  if(ab){ab.disabled=cnt===0;ab.style.background=cnt>0?meal.color:"#E2E8F0";ab.style.color=cnt>0?"#fff":"#94A3B8";ab.style.cursor=cnt>0?"pointer":"default";ab.textContent=cnt>0?\`Add \${cnt} Item\${cnt>1?"s":""} (\${tot} kcal)\`:"Select items above";}
+  if(ab){ab.disabled=cnt===0;ab.style.background=cnt>0?meal.color:"#E2E8F0";ab.style.color=cnt>0?"#fff":"#94A3B8";ab.textContent=cnt>0?`Add ${cnt} Item${cnt>1?"s":""} (${tot} kcal)`:"Select items above";}
 }
-function addSelectedFoods(mealId){
+
+window.addSelectedFoods = function(mealId){
   const ch=checkedFoods[mealId]||{},qt=foodQtys[mealId]||{};
   const entries=FOODS.filter(f=>ch[f.id]).map(f=>({...f,qty:parseFloat(qt[f.id]||1)||1,totalCal:Math.round(f.cal*(parseFloat(qt[f.id]||1)||1)),uid:uid()}));
-  if(!entries.length)return;
-  const day=getDay(window.currentDate);day.meals[mealId].push(...entries);saveData();
+  if(!entries.length) return;
+  const day=getDay(window.currentDate); day.meals[mealId].push(...entries); saveData();
   showToast("✅ "+entries.length+" item"+(entries.length>1?"s":"")+" added to "+MEAL_SLOTS.find(m=>m.id===mealId).label+"!");
-  openMealId=null;checkedFoods[mealId]={};FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";});
-  renderMealCards();updateHeader();
-}
-window.addSelectedFoods=addSelectedFoods;
-function removeFood(mealId,itemUid){
-  const day=getDay(window.currentDate);day.meals[mealId]=day.meals[mealId].filter(i=>i.uid!==itemUid);
-  saveData();renderMealCards();updateHeader();
-}
-window.removeFood=removeFood;
+  openMealId=null; checkedFoods[mealId]={}; FOODS.forEach(f=>{foodQtys[mealId][f.id]="1";});
+  renderMealCards(); updateHeader();
+};
+
+window.removeFood = function(mealId,itemUid){
+  const day=getDay(window.currentDate); day.meals[mealId]=day.meals[mealId].filter(i=>i.uid!==itemUid);
+  saveData(); renderMealCards(); updateHeader();
+};
+
 function renderMealCards(){
-  const container=document.getElementById("mealCards");container.innerHTML="";
+  const container=document.getElementById("mealCards"); container.innerHTML="";
   const day=getDay(window.currentDate);
   MEAL_SLOTS.forEach(meal=>{
     const items=day.meals[meal.id],total=mealTotal(items),isOpen=openMealId===meal.id;
     initFoodState(meal.id);
     const ch=checkedFoods[meal.id]||{},qt=foodQtys[meal.id]||{};
     let iHTML="";
-    items.forEach(item=>{iHTML+=\`<div class="logged-item"><div style="font-size:13px;color:#334155;flex:1">\${item.emoji} \${item.name} <span style="color:#94A3B8;font-size:11px">×\${item.qty} \${item.unit}</span></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;font-weight:700;color:\${meal.color}">\${item.totalCal} kcal</span><button class="remove-btn" onclick="removeFood('\${meal.id}','\${item.uid}')">×</button></div></div>\`;});
+    items.forEach(item=>{iHTML+=`<div class="logged-item"><div style="font-size:13px;color:#334155;flex:1">${item.emoji} ${item.name} <span style="color:#94A3B8;font-size:11px">×${item.qty} ${item.unit}</span></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;font-weight:700;color:${meal.color}">${item.totalCal} kcal</span><button class="remove-btn" onclick="removeFood('${meal.id}','${item.uid}')">×</button></div></div>`;});
     let pHTML="";
     if(isOpen){
       let fRowsHTML="";
       FOODS.forEach(food=>{
         const isC=!!ch[food.id],qty=qt[food.id]||"1",rc=Math.round(food.cal*(parseFloat(qty)||1));
-        fRowsHTML+=\`<div class="food-row" id="frow-\${meal.id}-\${food.id}" style="background:\${isC?"#fff":meal.bg+"80"};border:1.5px solid \${isC?meal.color:meal.border}" onclick="toggleFoodCheck('\${meal.id}','\${food.id}')"><input type="checkbox" id="cb-\${meal.id}-\${food.id}" \${isC?"checked":""} onclick="event.stopPropagation();toggleFoodCheck('\${meal.id}','\${food.id}')"/><span style="font-size:20px;flex-shrink:0">\${food.emoji}</span><div style="flex:1;min-width:0"><div class="food-row-name" style="font-size:13px;font-weight:\${isC?700:500};color:\${isC?"#1E3A5F":"#475569"}">\${food.name}</div><div style="font-size:10px;color:#94A3B8;margin-top:1px">\${food.note}</div></div><div class="stepper" onclick="event.stopPropagation()"><div class="stepper-row"><button class="stepper-btn" id="dec-\${meal.id}-\${food.id}" style="background:\${isC?meal.bg:"#F1F5F9"};color:\${isC?meal.color:"#CBD5E1"}" \${isC?"":"disabled"} onclick="event.stopPropagation();stepQty('\${meal.id}','\${food.id}',-1)">−</button><span class="stepper-val" id="qty-\${meal.id}-\${food.id}">\${qty}</span><button class="stepper-btn" id="inc-\${meal.id}-\${food.id}" style="background:\${isC?meal.bg:"#F1F5F9"};color:\${isC?meal.color:"#CBD5E1"}" \${isC?"":"disabled"} onclick="event.stopPropagation();stepQty('\${meal.id}','\${food.id}',1)">+</button></div><span style="font-size:9px;color:#94A3B8">\${food.unit}</span></div><div style="min-width:46px;text-align:right;flex-shrink:0"><div id="cal-\${meal.id}-\${food.id}" style="font-size:13px;font-weight:700;color:\${isC?meal.color:"#CBD5E1"}">\${rc}</div><div style="font-size:9px;color:#94A3B8">kcal</div></div></div>\`;
+        fRowsHTML+=`<div class="food-row" id="frow-${meal.id}-${food.id}" style="background:${isC?"#fff":meal.bg+"80"};border:1.5px solid ${isC?meal.color:meal.border}" onclick="toggleFoodCheck('${meal.id}','${food.id}')"><input type="checkbox" id="cb-${meal.id}-${food.id}" ${isC?"checked":""} onclick="event.stopPropagation();toggleFoodCheck('${meal.id}','${food.id}')"/><span style="font-size:20px;flex-shrink:0">${food.emoji}</span><div style="flex:1;min-width:0"><div class="food-row-name" style="font-size:13px;font-weight:${isC?700:500};color:${isC?"#1E3A5F":"#475569"}">${food.name}</div><div style="font-size:10px;color:#94A3B8;margin-top:1px">${food.note}</div></div><div class="stepper" onclick="event.stopPropagation()"><div class="stepper-row"><button class="stepper-btn" id="dec-${meal.id}-${food.id}" style="background:${isC?meal.bg:"#F1F5F9"};color:${isC?meal.color:"#CBD5E1"}" ${isC?"":"disabled"} onclick="event.stopPropagation();stepQty('${meal.id}','${food.id}',-1)">−</button><span class="stepper-val" id="qty-${meal.id}-${food.id}">${qty}</span><button class="stepper-btn" id="inc-${meal.id}-${food.id}" style="background:${isC?meal.bg:"#F1F5F9"};color:${isC?meal.color:"#CBD5E1"}" ${isC?"":"disabled"} onclick="event.stopPropagation();stepQty('${meal.id}','${food.id}',1)">+</button></div><span style="font-size:9px;color:#94A3B8">${food.unit}</span></div><div style="min-width:46px;text-align:right;flex-shrink:0"><div id="cal-${meal.id}-${food.id}" style="font-size:13px;font-weight:700;color:${isC?meal.color:"#CBD5E1"}">${rc}</div><div style="font-size:9px;color:#94A3B8">kcal</div></div></div>`;
       });
       const sC=FOODS.filter(f=>ch[f.id]).length,pC=FOODS.filter(f=>ch[f.id]).reduce((s,f)=>s+Math.round(f.cal*(parseFloat(qt[f.id]||1)||1)),0);
-      pHTML=\`<div class="picker-wrap" style="border:1px solid \${meal.border}"><div style="margin-bottom:12px"><span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:\${meal.bg};color:\${meal.color}">☑ Check items · set qty · tap Add All</span></div>\${fRowsHTML}<div class="picker-summary" style="border:1px solid \${meal.border}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:12px;color:#64748B" id="selInfo-\${meal.id}">\${sC>0?\`<strong style="color:\${meal.color}">\${sC}</strong> item\${sC>1?"s":""} selected\`:\`<span style="color:#CBD5E1">No items selected yet</span>\`}</div><div style="font-size:13px;font-weight:800;color:\${meal.color}" id="selCal-\${meal.id}">\${sC>0?"+"+pC+" kcal":""}</div></div><div style="display:flex;gap:8px"><button class="cancel-btn" onclick="toggleMealPicker('\${meal.id}')">Cancel</button><button class="add-all-btn" id="addBtn-\${meal.id}" \${sC===0?"disabled":""} style="background:\${sC>0?meal.color:"#E2E8F0"};color:\${sC>0?"#fff":"#94A3B8"};cursor:\${sC>0?"pointer":"default"}" onclick="addSelectedFoods('\${meal.id}')">\${sC>0?\`Add \${sC} Item\${sC>1?"s":""} (\${pC} kcal)\`:"Select items above"}</button></div></div></div>\`;
+      pHTML=`<div class="picker-wrap" style="border:1px solid ${meal.border}"><div style="margin-bottom:12px"><span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:${meal.bg};color:${meal.color}">☑ Check items · set qty · tap Add</span></div>${fRowsHTML}<div class="picker-summary" style="border:1px solid ${meal.border}"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:12px;color:#64748B" id="selInfo-${meal.id}">${sC>0?`<strong style="color:${meal.color}">${sC}</strong> item${sC>1?"s":""} selected`:`<span style="color:#CBD5E1">No items selected yet</span>`}</div><div style="font-size:13px;font-weight:800;color:${meal.color}" id="selCal-${meal.id}">${sC>0?"+"+pC+" kcal":""}</div></div><div style="display:flex;gap:8px"><button class="cancel-btn" onclick="toggleMealPicker('${meal.id}')">Cancel</button><button class="add-all-btn" id="addBtn-${meal.id}" ${sC===0?"disabled":""} style="background:${sC>0?meal.color:"#E2E8F0"};color:${sC>0?"#fff":"#94A3B8"}" onclick="addSelectedFoods('${meal.id}')">${sC>0?`Add ${sC} Item${sC>1?"s":""} (${pC} kcal)`:"Select items above"}</button></div></div></div>`;
     }
     const div=document.createElement("div");
-    div.className="meal-card";div.style.borderLeft="4px solid "+meal.color;
-    div.innerHTML=\`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:\${items.length>0||isOpen?12:0}px"><div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#1E3A5F"><span style="font-size:20px">\${meal.emoji}</span>\${meal.label}</div><div style="display:flex;align-items:center;gap:8px">\${total>0?\`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;color:\${meal.color};background:\${meal.bg}">\${total} kcal</span>":""}<button class="add-toggle" style="background:\${isOpen?"#EF4444":meal.color}" onclick="toggleMealPicker('\${meal.id}')">\${isOpen?"×":"+"}</button></div></div>\${iHTML}\${pHTML}\`;
+    div.className="meal-card"; div.style.borderLeft="4px solid "+meal.color;
+    div.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${items.length>0||isOpen?12:0}px"><div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#1E3A5F"><span style="font-size:20px">${meal.emoji}</span>${meal.label}</div><div style="display:flex;align-items:center;gap:8px">${total>0?`<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;color:${meal.color};background:${meal.bg}">${total} kcal</span>`:""}<button class="add-toggle" style="background:${isOpen?"#EF4444":meal.color}" onclick="toggleMealPicker('${meal.id}')">${isOpen?"×":"+"}</button></div></div>${iHTML}${pHTML}`;
     container.appendChild(div);
   });
 }
@@ -924,24 +825,27 @@ function syncActivityInputs(){
   document.getElementById("runInput").value=day.run||"";
   updateActivityUI();
 }
-window.syncActivityInputs=syncActivityInputs;
-const onActivityChange=debounce(function(){
-  const day=getDay(window.currentDate);
-  day.walk=parseFloat(document.getElementById("walkInput").value)||0;
-  day.run=parseFloat(document.getElementById("runInput").value)||0;
-  saveData();updateActivityUI();updateHeader();
-},300);
-window.onActivityChange=onActivityChange;
+window.syncActivityInputs = syncActivityInputs;
+
+window.onActivityChange = function(){
+  clearTimeout(actDebTimer);
+  actDebTimer=setTimeout(function(){
+    const day=getDay(window.currentDate);
+    day.walk=parseFloat(document.getElementById("walkInput").value)||0;
+    day.run=parseFloat(document.getElementById("runInput").value)||0;
+    saveData(); updateActivityUI(); updateHeader();
+  },300);
+};
+
 function updateActivityUI(){
-  const day=getDay(window.currentDate);
-  const wb=walkBurn(day),rb=runBurn(day),ae=activeEnergy(day),te=totalEnergy(day);
+  const day=getDay(window.currentDate),wb=walkBurn(day),rb=runBurn(day),ae=activeEnergy(day),te=totalEnergy(day);
   document.getElementById("walkBurnVal").textContent=wb;
   document.getElementById("runBurnVal").textContent=rb;
-  const sc=document.getElementById("burnSummaryCard");sc.style.display=(wb>0||rb>0)?"block":"none";
+  const sc=document.getElementById("burnSummaryCard"); sc.style.display=(wb>0||rb>0)?"block":"none";
   if(wb>0||rb>0){
     let rows="";
-    if(wb>0)rows+=\`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1E3A5F"><span>🚶 Walk \${day.walk} km</span><span style="font-weight:700;color:#0891B2">\${wb} kcal</span></div>\`;
-    if(rb>0)rows+=\`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1E3A5F"><span>🏃 Run \${day.run} km</span><span style="font-weight:700;color:#2563EB">\${rb} kcal</span></div>\`;
+    if(wb>0) rows+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1E3A5F"><span>🚶 Walk ${day.walk} km</span><span style="font-weight:700;color:#0891B2">${wb} kcal</span></div>`;
+    if(rb>0) rows+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:#1E3A5F"><span>🏃 Run ${day.run} km</span><span style="font-weight:700;color:#2563EB">${rb} kcal</span></div>`;
     document.getElementById("burnSummaryRows").innerHTML=rows;
     document.getElementById("totalActiveBurn").textContent=ae+" kcal";
     document.getElementById("totalBurnLabel").textContent=te.toLocaleString()+" kcal";
@@ -952,49 +856,47 @@ function updateActivityUI(){
 function renderPlanTab(){
   const todayDay=getDayName(window.currentDate);
   if(!window.selectedPlanDay||!WEEKDAYS.includes(window.selectedPlanDay)) window.selectedPlanDay=WEEKDAYS.includes(todayDay)?todayDay:"Mon";
-  renderDayStrip(todayDay);renderPlanBanner();renderPlanAccordions();
+  renderDayStrip(todayDay); renderPlanBanner(); renderPlanAccordions();
 }
 function renderDayStrip(todayDay){
-  const strip=document.getElementById("dayStrip");strip.innerHTML="";
+  const strip=document.getElementById("dayStrip"); strip.innerHTML="";
   WEEKDAYS.forEach(d=>{
     const isToday=d===todayDay,isSel=d===window.selectedPlanDay;
     const btn=document.createElement("button");
     btn.className="day-pill"+(isSel?" active":"")+(isToday&&!isSel?" today-pill":"");
-    btn.innerHTML=\`<span class="day-pill-lbl">\${d}</span>\${isToday?\`<div class="today-dot"></div>\`:\`<div style="height:5px"></div>\`}\`;
+    btn.innerHTML=`<span class="day-pill-lbl">${d}</span>${isToday?`<div class="today-dot"></div>`:`<div style="height:5px"></div>`}`;
     btn.onclick=()=>{window.selectedPlanDay=d;renderDayStrip(todayDay);renderPlanBanner();renderPlanAccordions();};
     strip.appendChild(btn);
   });
   document.getElementById("dayStripNote").innerHTML=window.selectedPlanDay===todayDay
-    ?\`<span style="color:#2563EB;font-weight:700">📍 Viewing today (\${window.selectedPlanDay})</span>\`
-    :\`Today: <strong style="color:#2563EB">\${todayDay}</strong> &nbsp;·&nbsp; Viewing: <strong>\${window.selectedPlanDay}</strong>\`;
+    ?`<span style="color:#2563EB;font-weight:700">📍 Viewing today (${window.selectedPlanDay})</span>`
+    :`Today: <strong style="color:#2563EB">${todayDay}</strong> &nbsp;·&nbsp; Viewing: <strong>${window.selectedPlanDay}</strong>`;
 }
 function renderPlanBanner(){
   const plan=WEEKLY_PLAN[window.selectedPlanDay];
   const total=plan.breakfast.cal+plan.lunch.cal+plan.dinner.cal;
-  const bar=(lbl,val,col)=>\`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:rgba(255,255,255,0.65)">\${lbl}</span><span style="font-weight:700;color:\${col}">\${val} kcal</span></div><div style="height:5px;background:rgba(255,255,255,0.12);border-radius:99px;overflow:hidden"><div style="height:100%;width:\${Math.min((val/700)*100,100).toFixed(0)}%;background:\${col};border-radius:99px"></div></div></div>\`;
-  document.getElementById("planBanner").innerHTML=\`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:14px;font-weight:800">\${window.selectedPlanDay}'s Calorie Plan</div><div style="font-size:18px;font-weight:800;color:#86EFAC">\${total} kcal</div></div>\${bar("🌅 Breakfast","104","#93C5FD")}\${bar("☀️ Lunch",plan.lunch.cal,"#67E8F9")}\${bar("🌙 Dinner",plan.dinner.cal,"#86EFAC")}<div style="display:flex;justify-content:flex-end;margin-top:4px"><span style="font-size:10px;color:rgba(255,255,255,0.4)">Breakfast + Lunch + Dinner = \${total} kcal</span></div>\`;
+  const bar=(lbl,val,col)=>`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:rgba(255,255,255,0.65)">${lbl}</span><span style="font-weight:700;color:${col}">${val} kcal</span></div><div style="height:5px;background:rgba(255,255,255,0.12);border-radius:99px;overflow:hidden"><div style="height:100%;width:${Math.min((val/700)*100,100).toFixed(0)}%;background:${col};border-radius:99px"></div></div></div>`;
+  document.getElementById("planBanner").innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:14px;font-weight:800">${window.selectedPlanDay}'s Calorie Plan</div><div style="font-size:18px;font-weight:800;color:#86EFAC">${total} kcal</div></div>${bar("🌅 Breakfast","124","#93C5FD")}${bar("☀️ Lunch",plan.lunch.cal,"#67E8F9")}${bar("🌙 Dinner",plan.dinner.cal,"#86EFAC")}<div style="display:flex;justify-content:flex-end;margin-top:4px"><span style="font-size:10px;color:rgba(255,255,255,0.4)">Breakfast + Lunch + Dinner = ${total} kcal</span></div>`;
 }
 function renderPlanAccordions(){
   const plan=WEEKLY_PLAN[window.selectedPlanDay];
-  const pRow=(emoji,name,cal,note,color)=>\`<div class="plan-row"><span style="font-size:20px;min-width:28px;flex-shrink:0">\${emoji}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#1E3A5F">\${name}</div>\${note?\`<div style="font-size:11px;color:#94A3B8;margin-top:2px">\${note}</div>\`:""}</div><div style="font-size:13px;font-weight:800;color:\${color};flex-shrink:0;padding-left:8px">\${cal} kcal</div></div>\`;
+  const pRow=(emoji,name,cal,note,color)=>`<div class="plan-row"><span style="font-size:20px;min-width:28px;flex-shrink:0">${emoji}</span><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#1E3A5F">${name}</div>${note?`<div style="font-size:11px;color:#94A3B8;margin-top:2px">${note}</div>`:""}</div><div style="font-size:13px;font-weight:800;color:${color};flex-shrink:0;padding-left:8px">${cal} kcal</div></div>`;
   document.getElementById("acc-breakfast-cal").textContent=plan.breakfast.cal+" kcal";
   document.getElementById("rows-breakfast").innerHTML=plan.breakfast.items.map(i=>pRow(i.emoji,i.name,i.cal,i.note,"#2563EB")).join("");
   document.getElementById("acc-lunch-cal").textContent=plan.lunch.cal+" kcal";
-  document.getElementById("acc-lunch-sub").textContent=window.selectedPlanDay+" · ~600 kcal";
-  document.getElementById("rows-lunch").innerHTML=[pRow(plan.lunch.carb.emoji,plan.lunch.carb.name,plan.lunch.carb.cal,"Primary carb","#0891B2"),pRow("🥦","Vegetables (2 cups)",plan.lunch.veg.cal,"Mixed / stir-fried","#0891B2"),pRow(plan.lunch.protein.emoji,plan.lunch.protein.name,plan.lunch.protein.cal,"Main protein","#0891B2"),...(plan.lunch.extras||[]).map(e=>pRow(e.emoji,e.name,e.cal,"Extra","#0891B2")),\`<div class="meal-total-row"><span style="font-size:12px;color:#64748B">Total</span><span style="font-size:15px;font-weight:800;color:#0891B2">\${plan.lunch.cal} kcal</span></div>\`].join("");
+  document.getElementById("acc-lunch-sub").textContent=window.selectedPlanDay+" · ~720 kcal";
+  document.getElementById("rows-lunch").innerHTML=[pRow(plan.lunch.carb.emoji,plan.lunch.carb.name,plan.lunch.carb.cal,"Primary carb","#0891B2"),pRow("🥦","Vegetables",plan.lunch.veg.cal,"Mixed / stir-fried","#0891B2"),pRow(plan.lunch.protein.emoji,plan.lunch.protein.name,plan.lunch.protein.cal,"Main protein","#0891B2"),...(plan.lunch.extras||[]).map(e=>pRow(e.emoji,e.name,e.cal,"Extra","#0891B2")),`<div class="meal-total-row"><span style="font-size:12px;color:#64748B">Total</span><span style="font-size:15px;font-weight:800;color:#0891B2">${plan.lunch.cal} kcal</span></div>`].join("");
   document.getElementById("tip-lunch").innerHTML="🍽 "+plan.lunch.note;
   document.getElementById("acc-dinner-cal").textContent=plan.dinner.cal+" kcal";
   document.getElementById("acc-dinner-sub").textContent=window.selectedPlanDay+" · "+plan.dinner.name;
-  document.getElementById("rows-dinner").innerHTML=[...plan.dinner.items.map(i=>pRow(i.emoji,i.name,i.cal,i.note,"#1E3A5F")),\`<div class="meal-total-row"><span style="font-size:12px;color:#64748B">Total</span><span style="font-size:15px;font-weight:800;color:#1E3A5F">\${plan.dinner.cal} kcal</span></div>\`].join("");
+  document.getElementById("rows-dinner").innerHTML=[...plan.dinner.items.map(i=>pRow(i.emoji,i.name,i.cal,i.note,"#1E3A5F")),`<div class="meal-total-row"><span style="font-size:12px;color:#64748B">Total</span><span style="font-size:15px;font-weight:800;color:#1E3A5F">${plan.dinner.cal} kcal</span></div>`].join("");
   document.getElementById("tip-dinner").innerHTML="💡 "+plan.dinner.tip;
   ["breakfast","lunch","dinner"].forEach(m=>applyAccordionState(m));
 }
-function toggleAccordion(mealId){accordionOpen[mealId]=!accordionOpen[mealId];applyAccordionState(mealId);}
-window.toggleAccordion=toggleAccordion;
+window.toggleAccordion = function(mealId){ accordionOpen[mealId]=!accordionOpen[mealId]; applyAccordionState(mealId); };
 function applyAccordionState(mealId){
-  const body=document.getElementById("body-"+mealId);
-  const chev=document.getElementById("chev-"+mealId);
-  if(!body||!chev)return;
+  const body=document.getElementById("body-"+mealId),chev=document.getElementById("chev-"+mealId);
+  if(!body||!chev) return;
   if(accordionOpen[mealId]){body.classList.remove("closed");chev.classList.add("open");}
   else{body.classList.add("closed");chev.classList.remove("open");}
 }
@@ -1003,32 +905,30 @@ function applyAccordionState(mealId){
 function renderHistory(){
   const container=document.getElementById("historyContent");
   const dates=Object.keys(window.allData).filter(d=>d!==window.currentDate).sort().reverse().slice(0,10);
-  if(!dates.length){container.innerHTML=\`<div style="text-align:center;padding:50px 0;color:#94A3B8;font-size:14px"><div style="font-size:40px;margin-bottom:10px">📅</div>No past data yet.<br/>Start logging today!</div>\`;return;}
+  if(!dates.length){container.innerHTML=`<div style="text-align:center;padding:50px 0;color:#94A3B8;font-size:14px"><div style="font-size:40px;margin-bottom:10px">📅</div>No past data yet.<br/>Start logging today!</div>`;return;}
   container.innerHTML=dates.map(d=>{
     const dx=window.allData[d]||emptyDay(),ci=foodTotal(dx),te=totalEnergy(dx),def=te-ci;
     const pct=Math.min((ci/INTAKE_TARGET)*100,100);
-    const actStr=(dx.walk>0?\`🚶\${dx.walk}km \`:"")+(dx.run>0?\`🏃\${dx.run}km\`:"");
-    return \`<div class="hist-card" style="border-left:4px solid \${def>=0?"#2563EB":"#EF4444"}" onclick="jumpToDate('\${d}')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:700;color:#1E3A5F">\${fmtDate(d)}</div><div style="font-size:11px;color:#94A3B8;margin-top:2px">\${actStr||"No activity logged"}</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:800;color:\${def>=0?"#2563EB":"#EF4444"}">\${def>=0?"−":"+"} \${Math.abs(def)} <span style="font-size:10px;font-weight:400;color:#94A3B8">kcal</span></div><div style="font-size:10px;color:#94A3B8">\${def>=0?"deficit":"surplus"}</div></div></div><div class="hist-bar-bg"><div class="hist-bar" style="width:\${pct}%;background:\${ci>INTAKE_TARGET?"linear-gradient(90deg,#F59E0B,#EF4444)":"linear-gradient(90deg,#86EFAC,#2563EB)"}"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8"><span>Intake: \${ci} kcal</span><span>Total Burn: \${te} kcal</span></div></div>\`;
+    const actStr=(dx.walk>0?`🚶${dx.walk}km `:"")+( dx.run>0?`🏃${dx.run}km`:"");
+    return `<div class="hist-card" style="border-left:4px solid ${def>=0?"#2563EB":"#EF4444"}" onclick="jumpToDate('${d}')"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:700;color:#1E3A5F">${fmtDate(d)}</div><div style="font-size:11px;color:#94A3B8;margin-top:2px">${actStr||"No activity logged"}</div></div><div style="text-align:right"><div style="font-size:15px;font-weight:800;color:${def>=0?"#2563EB":"#EF4444"}">${def>=0?"−":"+"} ${Math.abs(def)} <span style="font-size:10px;font-weight:400;color:#94A3B8">kcal</span></div><div style="font-size:10px;color:#94A3B8">${def>=0?"deficit":"surplus"}</div></div></div><div class="hist-bar-bg"><div class="hist-bar" style="width:${pct}%;background:${ci>INTAKE_TARGET?"linear-gradient(90deg,#F59E0B,#EF4444)":"linear-gradient(90deg,#86EFAC,#2563EB)"}"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;color:#94A3B8"><span>Intake: ${ci} kcal</span><span>Total Burn: ${te} kcal</span></div></div>`;
   }).join("");
 }
-function jumpToDate(d){
-  window.currentDate=d;document.getElementById("datePicker").value=d;
-  openMealId=null;checkedFoods={};foodQtys={};
-  renderMealCards();syncActivityInputs();updateHeader();switchTab("log");
-}
-window.jumpToDate=jumpToDate;
+window.jumpToDate = function(d){
+  window.currentDate=d; document.getElementById("datePicker").value=d;
+  openMealId=null; checkedFoods={}; foodQtys={};
+  renderMealCards(); syncActivityInputs(); updateHeader(); window.switchTab("log");
+};
 
 /* ── Clear ── */
-function showClearModal(){
-  document.getElementById("clearModalText").textContent=\`All food and activity for \${window.currentDate===todayStr()?"today":window.currentDate} will be permanently removed.\`;
+window.showClearModal = function(){
+  document.getElementById("clearModalText").textContent=`All food and activity for ${window.currentDate===todayStr()?"today":window.currentDate} will be permanently removed.`;
   document.getElementById("clearModal").classList.add("show");
-}
-window.showClearModal=showClearModal;
-window.hideClearModal=function(){document.getElementById("clearModal").classList.remove("show");};
-window.confirmClear=function(){
-  window.allData[window.currentDate]=emptyDay();saveData();
-  openMealId=null;checkedFoods={};foodQtys={};
-  window.hideClearModal();renderMealCards();syncActivityInputs();updateHeader();
+};
+window.hideClearModal = function(){ document.getElementById("clearModal").classList.remove("show"); };
+window.confirmClear = function(){
+  window.allData[window.currentDate]=emptyDay(); saveData();
+  openMealId=null; checkedFoods={}; foodQtys={};
+  window.hideClearModal(); renderMealCards(); syncActivityInputs(); updateHeader();
   showToast("Day cleared","#0891B2");
 };
 
@@ -1045,7 +945,6 @@ if('serviceWorker' in navigator){
     }).catch(()=>{});
   });
 }
-
 </script>
 </body>
 </html>
